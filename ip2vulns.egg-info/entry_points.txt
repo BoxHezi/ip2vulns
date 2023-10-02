@@ -1,2 +1,0 @@
-[console_scripts]
-ip2vulns = ip2vulns.ip2vulns:main
