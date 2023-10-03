@@ -1,8 +1,8 @@
-
 import argparse
 
 from . import utils
 from .Services import InternetDBService, CVEService
+
 
 def init_argparse():
     arg = argparse.ArgumentParser(description="IP 2 vulneribility tools", formatter_class=argparse.RawTextHelpFormatter)
@@ -54,6 +54,7 @@ def main():
         db_path = args.database
         targets = CVEService.start(db_path)
         print(targets)
+
 
 if __name__ == "__main__":
     main()

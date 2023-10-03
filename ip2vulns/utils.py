@@ -6,13 +6,13 @@ import requests
 import ipaddress
 
 
-def ip_query(ip: str):
+def ip_query(ip: str) -> requests.models.Response:
     api = "https://api.ipapi.is/?q="
     endpoint = api + ip
     return requests.get(endpoint, timeout=50)
 
 
-def asn_query(asn: str):
+def asn_query(asn: str) -> requests.models.Response:
     api = "https://api.ipapi.is/?q="
     endpoint = api + "as" + asn.strip()
     return requests.get(endpoint, timeout=50)
@@ -39,6 +39,18 @@ def is_cidr(s: str):
     :return: True if in cidr format, False otherwise
     """
     return "/" in s
+
+
+def cidr2ip(cidr: str, t6: bool = False) -> list:
+    """
+    convert cidr to ip list
+    :param cidr: cidr representation
+    :param t6: True if convert target is ipv6 address
+    :return: list of ipaddress
+    """
+    if not t6:
+        return [str(ip) for ip in ipaddress.IPv4Network(cidr)]
+    return [str(ip) for ip in ipaddress.IPv6Network(cidr)]
 
 
 def ip_int(ip: str) -> int:

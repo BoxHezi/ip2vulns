@@ -1,2 +1,6 @@
 dist/
 ip2vulns.egg-info/
+build/
+databases/
+.idea/
+__pycache__/
