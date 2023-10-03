@@ -28,7 +28,7 @@ def list_to_ips(ls, ipv6: bool = False) -> list:
 def start(db_path: str, ip_list: list, ipv6: bool = False):
     db = Database(db_path, model=InternetDB)
     ips = list_to_ips(ip_list, ipv6)
-    to_scan_list = utils.list_2_chunks(ips, 100)
+    to_scan_list = utils.split_list(ips)
     success_list = []
     fail_list = []
     for to_scan in to_scan_list:

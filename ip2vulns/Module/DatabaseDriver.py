@@ -5,9 +5,10 @@ from sqlalchemy.orm import sessionmaker
 
 from .. import utils
 
+
 class Database:
     def __init__(self, db_name: str, db_engine: str = "sqlite:///", model: any = None):
-        db_path = db_name[:db_name.rfind('/') + 1]
+        db_path = db_name[:db_name.rfind('/') + 1] if db_name.rfind("/") != -1 else "./"
         if not os.path.exists(db_path):
             utils.create_path(db_path)
         db = db_engine + db_name

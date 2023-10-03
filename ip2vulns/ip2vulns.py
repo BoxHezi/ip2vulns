@@ -22,11 +22,12 @@ def init_argparse():
                                                    "if no database if specified, use ./databases/internetdb.db",
                      nargs="+")
     arg.add_argument("-cve", "--cve", help="get cve information from database\n"
-                                           "require to use -db for specificing a database",
+                                           "require to use -db for specifying a database",
                      action="store_true")
     arg.add_argument("-db", "--database", help="Specify database will be used to stored/retrieve data")
-    arg.add_argument("--downloaddb", help="download CAPEC and CWE databaes, csv file, store in ./databases directory",
+    arg.add_argument("--downloaddb", help="download CAPEC and CWE database, csv file, store in ./databases directory",
                      action="store_true")
+    arg.add_argument("-o", "--out", help="Define output method, default store to database")
     return arg
 
 

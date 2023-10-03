@@ -8,7 +8,7 @@ setup(
     author_email="hezipypi.yixdpu@bumpmail.io",
     description="An IP to vulnerability utility",
     install_requires=[],
-    entry_points = {
+    entry_points={
         'console_scripts': [
             'ip2vulns = ip2vulns.ip2vulns:main'
         ]

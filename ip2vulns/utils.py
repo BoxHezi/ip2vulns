@@ -75,7 +75,7 @@ def list_2_str(ls, delimiter: str = ",") -> str:
     return '' if len(ls) == 0 else delimiter.join(str(i) for i in ls)
 
 
-def list_2_chunks(ls: list, size: int) -> list[list]:
+def split_list(ls: list, size: int = 256) -> list[list]:
     return [ls[i: i + size] for i in range(0, len(ls), size)]
 
 
