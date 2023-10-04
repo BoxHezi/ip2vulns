@@ -6,22 +6,22 @@ import requests
 import ipaddress
 
 
-def ip_query(ip: str) -> requests.models.Response:
+def ip_query(ip: str, timeout: int = 50) -> requests.models.Response:
     api = "https://api.ipapi.is/?q="
     endpoint = api + ip
-    return requests.get(endpoint, timeout=50)
+    return requests.get(endpoint, timeout=timeout)
 
 
-def asn_query(asn: str) -> requests.models.Response:
+def asn_query(asn: str, timeout: int = 50) -> requests.models.Response:
     api = "https://api.ipapi.is/?q="
     endpoint = api + "as" + asn.strip()
-    return requests.get(endpoint, timeout=50)
+    return requests.get(endpoint, timeout=timeout)
 
 
-def internet_db_query(ip: str):
+def internet_db_query(ip: str, timeout: int = 50):
     api = "https://internetdb.shodan.io/"
     endpoint = api + ip
-    return requests.get(endpoint, timeout=50)
+    return requests.get(endpoint, timeout=timeout)
 
 
 def resp_2_json(resp):

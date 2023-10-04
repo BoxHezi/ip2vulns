@@ -47,9 +47,9 @@ def main():
     if args.internetdb:  # type(internetdb) => list
         db_path = args.database if args.database else "./databases/internetdb.db"
         if args.database:
-            InternetDBService.start_db_enabled(db_path, args.internetdb)
+            InternetDBService.start_db_enabled(args.internetdb, db_path)
         else:
-            InternetDBService.start(args.out, args.internetdb)
+            InternetDBService.start(args.internetdb, args.out)
         # for item in succeed:
         #     print(str(item))
         #

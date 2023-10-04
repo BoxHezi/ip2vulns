@@ -26,14 +26,14 @@ def list_to_ips(ls, ipv6: bool = False) -> list:
 
 
 def query_idb(ip):
-    resp = utils.internet_db_query(ip)  # type(result) => resp
+    resp = utils.internet_db_query(ip, 50)  # type(result) => resp
     resp_json = utils.resp_2_json(resp)
     if "ip" not in resp_json:
         return None
     return InternetDB(resp_json)
 
 
-def start(out_dest, targets: list, ipv6: bool = False):
+def start(targets: list, out_dest: str = None, ipv6: bool = False):
     to_scan_list = utils.split_list(list_to_ips(targets, ipv6))
     success_list = []  # contains InternetDB instance
     fail_list = []  # contains ip address
@@ -57,7 +57,7 @@ def start(out_dest, targets: list, ipv6: bool = False):
             print(item)
 
 
-def start_db_enabled(db_path: str, targets: list, ipv6: bool = False):
+def start_db_enabled(targets: list, db_path: str, ipv6: bool = False):
     db = Database(db_path, model=InternetDB)
     to_scan_list = utils.split_list(list_to_ips(targets, ipv6))
     for to_scan in to_scan_list:
