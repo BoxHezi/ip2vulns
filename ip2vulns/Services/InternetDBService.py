@@ -25,7 +25,7 @@ def list_to_ips(ls, ipv6: bool = False) -> list:
     return output
 
 
-def internetdb_query(ip):
+def query_idb(ip):
     resp = utils.internet_db_query(ip)  # type(result) => resp
     resp_json = utils.resp_2_json(resp)
     if "ip" not in resp_json:
@@ -41,13 +41,8 @@ def start(out_dest, targets: list, ipv6: bool = False):
         print(f"Querying ip information from {to_scan[0]} ... {to_scan[-1]}")
         for ip in tqdm(to_scan):
             try:
-                # resp = utils.internet_db_query(ip)  # type(result) => resp
-                # resp_json = utils.resp_2_json(resp)
-                # if "ip" not in resp_json:
-                #     continue
-                # temp = InternetDB(resp_json)
-                temp = internetdb_query(ip)
-                temp is not None and success_list.append(temp)
+                idb_info = query_idb(ip)
+                idb_info is not None and success_list.append(idb_info)
             except Exception as e:
                 print(f"Exception: {e} while querying {ip}")
                 fail_list.append(ip)
@@ -69,14 +64,10 @@ def start_db_enabled(db_path: str, targets: list, ipv6: bool = False):
         print(f"Querying ip information from {to_scan[0]} ... {to_scan[-1]}")
         for ip in tqdm(to_scan):
             try:
-                # resp = utils.internet_db_query(ip)  # type(result) => resp
-                # resp_json = utils.resp_2_json(resp)
-                # if "ip" not in resp_json:
-                #     continue
-                # temp = InternetDB(resp_json)
-                temp = internetdb_query(ip)
+                idb_info = query_idb(ip)
                 dao = InternetDBDAO(db)
-                temp is not None and (dao.update_record(temp) if dao.has_record_for_ip(ip) else dao.add_record(temp))
+                idb_info is not None and (
+                    dao.update_record(idb_info) if dao.has_record_for_ip(ip) else dao.add_record(idb_info))
             except Exception as e:
                 print(f"Exception: {e} while querying {ip}")
     db.commit()
