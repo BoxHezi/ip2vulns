@@ -33,6 +33,13 @@ class InternetDB(declarative_base()):
         out += f"vulns: {self.vulns}\n"
         return out
 
+    def __str__(self):
+        out = []
+        for k, v in vars(self).items():
+            if not k.startswith("_"):
+                out.append(v.replace(",", "|") if "," in str(v) else str(v))
+        return ",".join(out)
+
 
 class InternetDBDAO:
     def __init__(self, db: Database):
