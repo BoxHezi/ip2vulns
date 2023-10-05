@@ -3,4 +3,6 @@ ip2vulns.egg-info/
 build/
 databases/
 .idea/
+.fleet/
+.vscode/
 __pycache__/

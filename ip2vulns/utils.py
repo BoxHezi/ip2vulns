@@ -1,4 +1,6 @@
 import os
+import sys
+import contextlib
 
 import datetime
 import requests
@@ -6,16 +8,16 @@ import requests
 import ipaddress
 
 
-def ip_query(ip: str, timeout: int = 50) -> requests.models.Response:
-    api = "https://api.ipapi.is/?q="
-    endpoint = api + ip
-    return requests.get(endpoint, timeout=timeout)
-
-
-def asn_query(asn: str, timeout: int = 50) -> requests.models.Response:
-    api = "https://api.ipapi.is/?q="
-    endpoint = api + "as" + asn.strip()
-    return requests.get(endpoint, timeout=timeout)
+# def ip_query(ip: str, timeout: int = 50) -> requests.models.Response:
+#     api = "https://api.ipapi.is/?q="
+#     endpoint = api + ip
+#     return requests.get(endpoint, timeout=timeout)
+#
+#
+# def asn_query(asn: str, timeout: int = 50) -> requests.models.Response:
+#     api = "https://api.ipapi.is/?q="
+#     endpoint = api + "as" + asn.strip()
+#     return requests.get(endpoint, timeout=timeout)
 
 
 def internet_db_query(ip: str, timeout: int = 50):
@@ -85,3 +87,42 @@ def debug_mode():
 
 def create_path(path: str):
     os.mkdir(path)
+
+
+def has_pipe_data():
+    return not os.isatty(sys.stdin.fileno())
+
+
+def read_from_pipe():
+    return [line.strip() for line in sys.stdin.readlines()]
+
+
+@contextlib.contextmanager
+def smart_open(file_path: str = None):
+    """
+    reference: https://stackoverflow.com/questions/17602878/how-to-handle-both-with-open-and-sys-stdout-nicely
+    """
+    if not file_path or file_path == "stdout":
+        fd = sys.stdout
+    else:
+        fd = open(file_path, "w")
+
+    try:
+        yield fd
+    finally:
+        fd.close()
+
+
+def output_to_dest(success_list: list, dest: str):
+    """
+    write data to given destination
+    :param success_list: list of ip addresses contains information
+    :param dest: destination to write to
+    """
+    if len(success_list) == 0:
+        print("Failed Rate reach 100%!!!")
+        return
+
+    with smart_open(dest) as fd:
+        for item in success_list:
+            print(item, file=fd)

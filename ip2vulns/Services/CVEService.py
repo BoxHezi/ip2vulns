@@ -63,12 +63,11 @@ def download_local_db():
 def download_file(url: str, to_download: str):
     print(f"Downloading {to_download.upper()} database...")
 
-    local_name_prefix = "./databases/" + to_download
     resp = requests.get(url)
     my_zip = ZipFile(BytesIO(resp.content))
 
     for zipped_file in my_zip.namelist():
-        local_name = local_name_prefix + zipped_file
+        local_name = to_download + zipped_file
         with open(local_name, "w"):  # clear file
             pass
 

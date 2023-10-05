@@ -46,15 +46,12 @@ def start(targets: list, out_dest: str = None, ipv6: bool = False):
             except Exception as e:
                 print(f"Exception: {e} while querying {ip}")
                 fail_list.append(ip)
-        # TODO: output to corresponding destination based on {out_dest}
-        print(f"Result for ip from {to_scan[0]} ... {to_scan[-1]}")
-        print(f"Success list: ")
-        for item in success_list:
-            print(str(item))
-        print()
-        print(f"Exception occurred when querying: ")
-        for item in fail_list:
-            print(item)
+
+        utils.output_to_dest(success_list, out_dest)  # writing to destination (stdout by default)
+        if len(fail_list) != 0:
+            print("Exception happened during following IP addresses: ")
+            for ip in fail_list:
+                print(ip)
 
 
 def start_db_enabled(targets: list, db_path: str, ipv6: bool = False):
