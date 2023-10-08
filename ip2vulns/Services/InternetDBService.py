@@ -47,7 +47,10 @@ def start(targets: list, out_dest: str = None, ipv6: bool = False):
                 print(f"Exception: {e} while querying {ip}")
                 fail_list.append(ip)
 
-        utils.output_to_dest(success_list, out_dest)  # writing to destination (stdout by default)
+        if len(success_list) != 0:
+            utils.output_to_dest(success_list, out_dest)  # writing to destination (stdout by default)
+        else:
+            print(f"No available information from IP range from {to_scan[0]} ... {to_scan[-1]}")
         if len(fail_list) != 0:
             print("Exception happened during following IP addresses: ")
             for ip in fail_list:

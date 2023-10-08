@@ -120,10 +120,6 @@ def output_to_dest(success_list: list, dest: str):
     :param success_list: list of ip addresses contains information
     :param dest: destination to write to
     """
-    if len(success_list) == 0:
-        print("Failed Rate reach 100%!!!")
-        return
-
     with smart_open(dest) as fd:
         if dest is None or "csv" in dest:
             for item in success_list:
