@@ -6,18 +6,7 @@ import datetime
 import requests
 
 import ipaddress
-
-
-# def ip_query(ip: str, timeout: int = 50) -> requests.models.Response:
-#     api = "https://api.ipapi.is/?q="
-#     endpoint = api + ip
-#     return requests.get(endpoint, timeout=timeout)
-#
-#
-# def asn_query(asn: str, timeout: int = 50) -> requests.models.Response:
-#     api = "https://api.ipapi.is/?q="
-#     endpoint = api + "as" + asn.strip()
-#     return requests.get(endpoint, timeout=timeout)
+import json
 
 
 def internet_db_query(ip: str, timeout: int = 50):
@@ -97,6 +86,18 @@ def read_from_pipe():
     return [line.strip() for line in sys.stdin.readlines()]
 
 
+def jsonify_objs(objs: list[any]):
+    json_list = []
+    for obj in objs:
+        temp = {}
+        for k, v in vars(obj).items():
+            if k.startswith("_"):
+                continue
+            temp[k] = v
+        json_list.append(temp)
+    return json_list
+
+
 @contextlib.contextmanager
 def smart_open(file_path: str = None):
     """
@@ -124,5 +125,8 @@ def output_to_dest(success_list: list, dest: str):
         return
 
     with smart_open(dest) as fd:
-        for item in success_list:
-            print(item, file=fd)
+        if dest is None or "csv" in dest:
+            for item in success_list:
+                print(str(item), file=fd)
+        elif "json" in dest:
+            json.dump(jsonify_objs(success_list), fp=fd, indent=4, sort_keys=True)

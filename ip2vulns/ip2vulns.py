@@ -18,7 +18,7 @@ def init_argparse():
     arg.add_argument("--downloaddb", help="download CAPEC and CWE database, csv file, store in ./databases directory",
                      action="store_true")
     arg.add_argument("-o", "--out", help="Define output file, default print to stdout\n"
-                                         "Available option: stdout (default), csv\n"
+                                         "Available option: stdout (default), csv, json\n"
                                          "Note: if -db flag is enabled, -out option will be disabled")
     return arg
 
@@ -38,6 +38,7 @@ def main():
     if args.downloaddb:
         CVEService.download_local_db()
 
+    # TODO: add cvss score check with threshold
     # if args.cve:
     #     if not args.database:
     #         raise "Database required"
