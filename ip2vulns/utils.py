@@ -104,6 +104,10 @@ def read_from_pipe():
 
 
 def jsonify_objs(objs: list[any]):
+    """
+    convert list of objects to json format
+    :param objs: list of objects to be processed
+    """
     json_list = []
     for obj in objs:
         temp = {}
@@ -137,7 +141,7 @@ def output_to_dest(success_list: list, dest: str):
     :param success_list: list of ip addresses contains information
     :param dest: destination to write to
     """
-    with smart_open(dest) as fd:
+    with smart_open(dest) as fd:  # fd: file descriptor
         if dest is None or "csv" in dest:
             for item in success_list:
                 print(str(item), file=fd)
