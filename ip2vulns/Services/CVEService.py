@@ -18,41 +18,10 @@ from ..Module.InternetDB import InternetDB, InternetDBDAO
 # CWE CSV: https://cwe.mitre.org/data/csv/2000.csv.zip
 
 
-def start(db_path: str):
-    db = Database(db_path, model=InternetDB)
-    dao = InternetDBDAO(db)
-    records = dao.get_all_records_has_vulns()
-    potential_targets = set()
-
-    checked_set = set()
-    checked_high_set = set()
+def cve_query(cve_id: str, threshold: float = 7):
     cve_search = ares.CVESearch()
-
-    for r in records:
-        cves = r.vulns.split(",")
-        if contain_high_cve(cve_search, cves, checked_set, checked_high_set):
-            potential_targets.update(r.hostnames.split(","))
-    return list(potential_targets)
-
-
-def contain_high_cve(cve_search: ares.CVESearch, cves: list, checked_set: set, high_set: set, threshold: int = 7):
-    for cve in tqdm(cves):
-        if cve in checked_set:
-            if cve in high_set:
-                return True
-            continue
-        try:
-            cve_info = cve_search.id(cve)
-            cvss = cve_info["cvss"]
-            checked_set.add(cve)
-            if cvss and cvss > threshold:
-                high_set.add(cve)
-                return True
-        except requests.exceptions.ConnectionError as e:
-            print(f"Connection Exception: {e} for CVE: {cve}")
-        except requests.exceptions.ReadTimeout as e:
-            print(f"Read Timeout: {e} when querying {cve}")
-    return False
+    cve_info = cve_search.id(cve_id)
+    return cve_info and cve_info["cvss"] and float(cve_info["cvss"]) > float(threshold)
 
 
 def download_local_db():

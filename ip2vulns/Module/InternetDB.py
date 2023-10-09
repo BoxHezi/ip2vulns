@@ -20,11 +20,11 @@ class InternetDB(declarative_base()):
     def __init__(self, data):
         self.ip = utils.ip_int(data["ip"])
         self.ip_str = data["ip"]
-        self.hostnames = utils.list_2_str(data["hostnames"])
-        self.ports = utils.list_2_str(data["ports"])
-        self.cpes = utils.list_2_str(data["cpes"])
-        self.vulns = utils.list_2_str(data["vulns"])
-        self.tags = utils.list_2_str(data["tags"])
+        self.hostnames = data["hostnames"]
+        self.ports = data["ports"]
+        self.cpes = data["cpes"]
+        self.vulns = data["vulns"]
+        self.tags = data["tags"]
 
     def __repr__(self):
         out = f"IP: {self.ip_str}\n"
@@ -37,8 +37,17 @@ class InternetDB(declarative_base()):
         out = []
         for k, v in vars(self).items():
             if not k.startswith("_"):
-                out.append(v.replace(",", "|") if "," in str(v) else str(v))
+                if isinstance(v, list):
+                    v = "|".join([str(i) for i in v])
+                out.append(str(v))
         return ",".join(out)
+
+    def format_data_for_db(self):
+        self.hostnames = utils.list_2_str(self.hostnames)
+        self.ports = utils.list_2_str(self.ports)
+        self.cpes = utils.list_2_str(self.cpes)
+        self.vulns = utils.list_2_str(self.vulns)
+        self.tags = utils.list_2_str(self.tags)
 
 
 class InternetDBDAO:

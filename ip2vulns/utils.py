@@ -62,11 +62,25 @@ def ip_str(ip: int) -> str:
     return str(ipaddress.ip_address(ip))
 
 
-def list_2_str(ls, delimiter: str = ",") -> str:
+def list_2_str(ls: list, delimiter: str = ",") -> str:
+    """
+    turn list to string, separate by delimiter, default using comma
+    :param ls: list to be processed
+    :param delimiter: delimiter to be used to separate list item
+    """
     return '' if len(ls) == 0 else delimiter.join(str(i) for i in ls)
 
 
+def str_2_list(string: str, delimiter: str = ",") -> list:
+    return string.split(delimiter)
+
+
 def split_list(ls: list, size: int = 256) -> list[list]:
+    """
+    split list into a fixed size of chunks
+    :param ls: list to be processed
+    :param size: size to be splited into
+    """
     return [ls[i: i + size] for i in range(0, len(ls), size)]
 
 
@@ -75,7 +89,10 @@ def debug_mode():
 
 
 def create_path(path: str):
-    os.mkdir(path)
+    try:
+        os.mkdir(path)
+    except Exception as _:
+        print(f"Cannot make directory {path}")
 
 
 def has_pipe_data():

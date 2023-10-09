@@ -5,6 +5,8 @@ from ..Module.DatabaseDriver import Database
 
 from .. import utils
 
+from . import CVEService
+
 
 # ref: https://internetdb.shodan.io/
 
@@ -33,7 +35,7 @@ def query_idb(ip):
     return InternetDB(resp_json)
 
 
-def start(targets: list, out_dest: str = None, ipv6: bool = False):
+def start(targets: list, out_dest: str = None, cvss_threshold: float = None, ipv6: bool = False):
     to_scan_list = utils.split_list(list_to_ips(targets, ipv6))
     success_list = []  # contains InternetDB instance
     fail_list = []  # contains ip address
@@ -47,6 +49,18 @@ def start(targets: list, out_dest: str = None, ipv6: bool = False):
                 print(f"Exception: {e} while querying {ip}")
                 fail_list.append(ip)
 
+        # filter result based on given cvss_threshold
+        if cvss_threshold and len(success_list) != 0:
+            temp_ls = []
+            for item in success_list:
+                if len(item.vulns) == 0:
+                    continue
+                for vuln in item.vulns:
+                    if CVEService.cve_query(vuln, cvss_threshold):
+                        temp_ls.append(item)
+                        break
+            success_list = temp_ls
+
         if len(success_list) != 0:
             utils.output_to_dest(success_list, out_dest)  # writing to destination (stdout by default)
         else:
@@ -57,7 +71,7 @@ def start(targets: list, out_dest: str = None, ipv6: bool = False):
                 print(ip)
 
 
-def start_db_enabled(targets: list, db_path: str, ipv6: bool = False):
+def start_db_enabled(targets: list, db_path: str, cvss_threshold: float = None, ipv6: bool = False):
     db = Database(db_path, model=InternetDB)
     to_scan_list = utils.split_list(list_to_ips(targets, ipv6))
     for to_scan in to_scan_list:
@@ -65,6 +79,7 @@ def start_db_enabled(targets: list, db_path: str, ipv6: bool = False):
         for ip in tqdm(to_scan):
             try:
                 idb_info = query_idb(ip)
+                idb_info.format_data_for_db()
                 dao = InternetDBDAO(db)
                 idb_info is not None and (
                     dao.update_record(idb_info) if dao.has_record_for_ip(ip) else dao.add_record(idb_info))
