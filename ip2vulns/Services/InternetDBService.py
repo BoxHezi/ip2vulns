@@ -62,8 +62,6 @@ def display_result(success_list: list, failure_list: list, out_dest: str):
     """
     if len(success_list) != 0:
         utils.output_to_dest(success_list, out_dest)  # writing to destination (stdout by default)
-    else:
-        print(f"No available information from IP range from {to_scan[0]} ... {to_scan[-1]}")
     if len(failure_list) != 0:
         print("Exception happened during following IP addresses: ")
         for ip in failure_list:
@@ -88,7 +86,10 @@ def start(targets: list, out_dest: str = None, cvss_threshold: float = None, ipv
                 print(f"Exception: {e} while querying {ip}")
                 failure_list.append(ip)
 
-        display_result(success_list, failure_list, out_dest)
+        if len(success_list) != 0 or len(failure_list) != 0:
+            display_result(success_list, failure_list, out_dest)
+        else:
+            print(f"No available information from IP range from {to_scan[0]} ... {to_scan[-1]}")
 
 
 def start_db_enabled(targets: list, db_path: str, cvss_threshold: float = None, ipv6: bool = False):
