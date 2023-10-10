@@ -40,22 +40,17 @@ def query_idb(ip):
     return InternetDB(resp_json)
 
 
-def filter_cvss(ls: list, cvss_threshold: float = None):
+def filter_cvss(idb: InternetDB, cvss_threshold: float = None):
     """
     filter ls based on given cvss score, if cvss score of given cve is higher then cvss threshold score, append it to list
     :param ls: list of InternetDB instance
     :param cvss_threshold: cvss score threshold
-    :return: list of InternetDB contains CVE(s) has/have cvss score greater than cvss_threshold
+    :return: True if idb contains CVE which has cvss score greater than cvss_threshold
     """
-    out_ls = []
-    for idb in ls:
-        if len(idb.vulns) == 0:
-            continue
-        for vuln in idb.vulns:
-            if CVEService.cve_query(vuln, cvss_threshold):
-                out_ls.append(idb)
-                break
-    return out_ls
+    for vuln in idb.vulns:
+        if CVEService.cve_query(vuln, cvss_threshold):
+            return True
+    return False
 
 
 def display_result(success_list: list, failure_list: list, out_dest: str):
@@ -83,15 +78,15 @@ def start(targets: list, out_dest: str = None, cvss_threshold: float = None, ipv
         print(f"Querying ip information from {to_scan[0]} ... {to_scan[-1]}")
         for ip in tqdm(to_scan):
             try:
-                idb_info = query_idb(ip)
-                idb_info is not None and success_list.append(idb_info)
+                idb_info = query_idb(ip)  # query from shodan internetdb api and create InternetDB instance
+                if cvss_threshold:
+                    if idb_info and filter_cvss(idb_info, cvss_threshold):
+                        success_list.append(idb_info)
+                else:
+                    idb_info is not None and success_list.append(idb_info)
             except Exception as e:
                 print(f"Exception: {e} while querying {ip}")
                 failure_list.append(ip)
-
-        # filter result based on given cvss_threshold
-        if cvss_threshold:
-            success_list = filter_cvss(success_list, cvss_threshold)
 
         display_result(success_list, failure_list, out_dest)
 
@@ -104,10 +99,15 @@ def start_db_enabled(targets: list, db_path: str, cvss_threshold: float = None, 
         for ip in tqdm(to_scan):
             try:
                 idb_info = query_idb(ip)
-                idb_info.format_data_for_db()
                 dao = InternetDBDAO(db)
-                idb_info is not None and (
-                    dao.update_record(idb_info) if dao.has_record_for_ip(ip) else dao.add_record(idb_info))
+                if cvss_threshold:
+                    if idb_info and filter_cvss(idb_info, cvss_threshold):
+                        idb_info.format_data_for_db()
+                        dao.update_record(idb_info) if dao.has_record_for_ip(ip) else dao.add_record(idb_info)
+                else:
+                    idb_info and idb_info.format_data_for_db()
+                    idb_info is not None and (
+                        dao.update_record(idb_info) if dao.has_record_for_ip(ip) else dao.add_record(idb_info))
             except Exception as e:
                 print(f"Exception: {e} while querying {ip}")
     db.commit()

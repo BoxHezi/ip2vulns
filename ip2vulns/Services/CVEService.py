@@ -18,7 +18,7 @@ from ..Module.InternetDB import InternetDB, InternetDBDAO
 # CWE CSV: https://cwe.mitre.org/data/csv/2000.csv.zip
 
 
-def cve_query(cve_id: str, threshold: float = 7):
+def cve_query(cve_id: str, threshold: float):
     cve_search = ares.CVESearch()
     cve_info = cve_search.id(cve_id)
     return cve_info and cve_info["cvss"] and float(cve_info["cvss"]) > float(threshold)
