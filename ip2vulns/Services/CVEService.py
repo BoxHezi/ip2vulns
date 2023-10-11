@@ -7,9 +7,6 @@ import time  # add time.sleep(6) if query from nvdlib, due to requests rate limi
 import nvdlib
 import ares  # python wrapper for https://www.circl.lu/services/cve-search/
 
-from ..Module.DatabaseDriver import Database
-from ..Module.InternetDB import InternetDB, InternetDBDAO
-
 
 # NIST NVD CVE API reference: https://nvd.nist.gov/developers/vulnerabilities
 # NVDLib Documentation: https://nvdlib.com/en/latest/v1/v1.html#search-cpe

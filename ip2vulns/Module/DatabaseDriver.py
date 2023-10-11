@@ -8,6 +8,8 @@ from .. import utils
 
 class Database:
     def __init__(self, db_name: str, db_engine: str = "sqlite:///", model: any = None):
+        if db_name is None:  # set default database path
+            db_name = "internetdb.db"
         db_path = db_name[:db_name.rfind('/') + 1] if db_name.rfind("/") != -1 else "./"
         if not os.path.exists(db_path):
             utils.create_path(db_path)

@@ -85,6 +85,10 @@ def split_list(ls: list, size: int = 256) -> list[list]:
 
 
 def debug_mode():
+    """
+    check if debug mode is enabled
+    :return: True if in debug mode, False otherwise
+    """
     return bool(os.getenv("DEBUG"))
 
 
@@ -107,6 +111,7 @@ def jsonify_objs(objs: list[any]):
     """
     convert list of objects to json format
     :param objs: list of objects to be processed
+    :return: list of jsonified objects
     """
     json_list = []
     for obj in objs:

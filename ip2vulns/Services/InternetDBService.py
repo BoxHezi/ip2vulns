@@ -53,7 +53,7 @@ def filter_cvss(idb: InternetDB, cvss_threshold: float = None):
     return False
 
 
-def display_result(success_list: list, failure_list: list, out_dest: str):
+def write_result(success_list: list, failure_list: list, out_dest: str):
     """
     display result
     :param success_list: list of InternetDB instance
@@ -68,48 +68,48 @@ def display_result(success_list: list, failure_list: list, out_dest: str):
             print(ip)
 
 
-def start(targets: list, out_dest: str = None, cvss_threshold: float = None, ipv6: bool = False):
-    to_scan_list = utils.split_list(list_to_ips(targets, ipv6))
+def start_scan(ips: list, cvss_threshold: float = None):
+    """
+    start scanning
+    :param ips: list of ip to scan
+    :param cvss_threshold: cvss score threshold
+    :return: a size 2 tuple, contains success_list and failure_list
+    """
+    print(f"Querying ip information from {ips[0]} ... {ips[-1]}")
     success_list = []  # contains InternetDB instance
     failure_list = []  # contains ip address
-    for to_scan in to_scan_list:
-        print(f"Querying ip information from {to_scan[0]} ... {to_scan[-1]}")
-        for ip in tqdm(to_scan):
-            try:
-                idb_info = query_idb(ip)  # query from shodan internetdb api and create InternetDB instance
-                if cvss_threshold:
-                    if idb_info and filter_cvss(idb_info, cvss_threshold):
-                        success_list.append(idb_info)
-                else:
-                    idb_info is not None and success_list.append(idb_info)
-            except Exception as e:
-                print(f"Exception: {e} while querying {ip}")
-                failure_list.append(ip)
-
-        if len(success_list) != 0 or len(failure_list) != 0:
-            display_result(success_list, failure_list, out_dest)
-        else:
-            print(f"No available information from IP range from {to_scan[0]} ... {to_scan[-1]}")
+    for ip in tqdm(ips):
+        try:
+            idb_info = query_idb(ip)
+            if cvss_threshold:
+                if idb_info and filter_cvss(idb_info, cvss_threshold):
+                    success_list.append(idb_info)
+            else:
+                idb_info is not None and success_list.append(idb_info)
+        except Exception as e:
+            print(f"Exception: {e} while querying {ip}")
+            failure_list.append(ip)
+    return success_list, failure_list
 
 
-def start_db_enabled(targets: list, db_path: str, cvss_threshold: float = None, ipv6: bool = False):
-    db = Database(db_path, model=InternetDB)
+def start(targets: list, out_dest: str, db_enabled: bool, cvss_threshold: float = None, ipv6: bool = False):
+    """
+    entry point for InternetDBService
+    """
+    db = Database(out_dest, model=InternetDB) if db_enabled else None
     to_scan_list = utils.split_list(list_to_ips(targets, ipv6))
     for to_scan in to_scan_list:
-        print(f"Querying ip information from {to_scan[0]} ... {to_scan[-1]}")
-        for ip in tqdm(to_scan):
-            try:
-                idb_info = query_idb(ip)
-                dao = InternetDBDAO(db)
-                if cvss_threshold:
-                    if idb_info and filter_cvss(idb_info, cvss_threshold):
-                        idb_info.format_data_for_db()
-                        dao.update_record(idb_info) if dao.has_record_for_ip(ip) else dao.add_record(idb_info)
-                else:
-                    idb_info and idb_info.format_data_for_db()
-                    idb_info is not None and (
-                        dao.update_record(idb_info) if dao.has_record_for_ip(ip) else dao.add_record(idb_info))
-            except Exception as e:
-                print(f"Exception: {e} while querying {ip}")
-    db.commit()
-    db.close()
+        success_list, failure_list = start_scan(to_scan, cvss_threshold)
+        if db_enabled:  # write to database
+            dao = InternetDBDAO(db)
+            for idb in success_list:  # type(idb) => InternetDB instance
+                idb.format_data_for_db()
+                dao.update_record(idb) if dao.has_record_for_ip(idb.ip) else dao.add_record(idb)
+            db.commit()
+        else:  # write to file or stdout
+            if len(success_list) != 0 or len(failure_list) != 0:
+                write_result(success_list, failure_list, out_dest)
+            else:
+                print(f"No available information from IP range from {to_scan[0]} ... {to_scan[-1]}")
+    if db:  # if database is created
+        db.close()

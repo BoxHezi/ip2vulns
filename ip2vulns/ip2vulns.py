@@ -11,14 +11,16 @@ def init_argparse():
                                                    ":e.g. -inet 8.8.8.8 51.83.59.99 192.168.0.0/24\n"
                                                    "if no database if specified, use ./databases/internetdb.db",
                      nargs="+")
-    arg.add_argument("-s", "--cvss", help="enable cvss score filter, required a number\n"
-                                           "")
-    arg.add_argument("-db", "--database", help="Specify database will be used to store/retrieve data")
-    arg.add_argument("--downloaddb", help="download CAPEC and CWE database, csv file, store in ./databases directory",
-                     action="store_true")
     arg.add_argument("-o", "--out", help="Define output file, default print to stdout\n"
                                          "Available option: stdout (default), csv, json\n"
                                          "Note: if -db flag is enabled, -out option will be disabled")
+    arg.add_argument("-s", "--cvss", help="enable cvss score filter, required a number\n"
+                                           "")
+    arg.add_argument("-db", "--database", help="Write result to database\n"
+                                               "if no -o flag is provide, write data to internetdb.db in the same directory",
+                    action="store_true")
+    arg.add_argument("--downloaddb", help="download CAPEC and CWE database, csv file, store in ./databases directory",
+                     action="store_true")
     return arg
 
 
@@ -28,11 +30,7 @@ def main():
         args.internetdb = utils.read_from_pipe()
 
     if args.internetdb:  # type(internetdb) => list
-        db_path = args.database if args.database else "./databases/internetdb.db"
-        if args.database:
-            InternetDBService.start_db_enabled(args.internetdb, db_path, args.cvss)
-        else:
-            InternetDBService.start(args.internetdb, args.out, args.cvss)
+        InternetDBService.start(args.internetdb, args.out, args.database, args.cvss)
 
     if args.downloaddb:
         CVEService.download_local_db()
