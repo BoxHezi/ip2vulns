@@ -168,5 +168,3 @@ def output_to_dest(success_list: list, dest: str):
         elif "json" in dest:
             json.dump(jsonify_objs(success_list), fp=fd, indent=4, sort_keys=True)
 
-        if fd == sys.stdout:
-            print("=" * 20)
