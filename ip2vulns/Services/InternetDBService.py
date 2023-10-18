@@ -7,6 +7,9 @@ from .. import utils
 
 from . import CVEService
 
+import time
+import os
+
 
 # ref: https://internetdb.shodan.io/
 
@@ -47,10 +50,17 @@ def filter_cvss(idb: InternetDB, cvss_threshold: float = None):
     :param cvss_threshold: cvss score threshold
     :return: True if idb contains CVE which has cvss score greater than cvss_threshold
     """
-    for vuln in idb.vulns:
-        if CVEService.cve_query(vuln, cvss_threshold):
-            return True
-    return False
+    # for vuln in idb.vulns:
+    #     if CVEService.cve_query(vuln, cvss_threshold):
+    #         return True
+    # return False
+    cves = idb.vulns
+    for cve in cves:
+        test = CVEService.cve_query_nvd(cve, threshold=cvss_threshold,key=os.getenv("NVD_KEY"))
+        print(f"{cve} - {test}")
+        if test:
+            break
+        time.sleep(3)
 
 
 def write_result(success_list: list, failure_list: list, out_dest: str):

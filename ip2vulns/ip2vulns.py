@@ -16,7 +16,7 @@ def init_argparse():
                                          "Note: if -db flag is enabled, -out option will be disabled")
     arg.add_argument("-s", "--cvss", help="enable cvss score filter, required a number\n"
                                            "")
-    arg.add_argument("-db", "--database", help="Write result to database\n"
+    arg.add_argument("-d", "--database", help="Write result to database\n"
                                                "if no -o flag is provide, write data to internetdb.db in the same directory",
                     action="store_true")
     arg.add_argument("--downloaddb", help="download CAPEC and CWE database, csv file, store in ./databases directory",

@@ -92,6 +92,14 @@ def debug_mode():
     return bool(os.getenv("DEBUG"))
 
 
+def nvd_key():
+    """
+    get NVD_KEY from environment varialbe
+    :return: NVD_KEY if key exists, None otherwise
+    """
+    return os.getenv("NVD_KEY")
+
+
 def create_path(path: str):
     try:
         os.mkdir(path)
