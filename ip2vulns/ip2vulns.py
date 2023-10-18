@@ -21,6 +21,8 @@ def init_argparse():
                     action="store_true")
     arg.add_argument("--downloaddb", help="download CAPEC and CWE database, csv file, store in ./databases directory",
                      action="store_true")
+    arg.add_argument("--ho", help="Output hostnames only for scan result.\n"
+                     "This option DOES NOT apply to -d/--database option", action="store_true")
     return arg
 
 
@@ -30,7 +32,7 @@ def main():
         args.internetdb = utils.read_from_pipe()
 
     if args.internetdb:  # type(internetdb) => list
-        InternetDBService.start(args.internetdb, args.out, args.database, args.cvss)
+        InternetDBService.start(args.internetdb, args.out, args.database, args.cvss, args.ho)
 
     if args.downloaddb:
         CVEService.download_local_db()

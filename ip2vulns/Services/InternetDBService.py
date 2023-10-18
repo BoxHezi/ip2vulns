@@ -2,12 +2,10 @@ from tqdm import tqdm
 
 from ..Module.InternetDB import InternetDB, InternetDBDAO
 from ..Module.DatabaseDriver import Database
-
 from .. import utils
 
 from . import CVEService
 
-import time
 import os
 
 
@@ -50,26 +48,28 @@ def filter_cvss(idb: InternetDB, cvss_threshold: float = None):
     :param cvss_threshold: cvss score threshold
     :return: True if idb contains CVE which has cvss score greater than cvss_threshold
     """
-    # for vuln in idb.vulns:
-    #     if CVEService.cve_query(vuln, cvss_threshold):
-    #         return True
-    # return False
     cves = idb.vulns
-    for cve in cves:
-        test = CVEService.cve_query_nvd(cve, threshold=cvss_threshold,key=os.getenv("NVD_KEY"))
-        print(f"{cve} - {test}")
-        if test:
-            break
-        time.sleep(3)
+    for cve_id in cves:
+        potential_target = CVEService.cve_query_nvd(cve_id, threshold=cvss_threshold, key=os.getenv("NVD_KEY"))
+        if potential_target:
+            return True
+    return False
 
 
-def write_result(success_list: list, failure_list: list, out_dest: str):
+def write_result(success_list: list, failure_list: list, out_dest: str, output_option: bool):
     """
     display result
     :param success_list: list of InternetDB instance
     :param failure_list: list of IP when exception happened during querying from shodan internetdb api
     :param out_dest: output destionation, default output to stdout
     """
+    temp = []
+    if output_option:
+        for idb in success_list:
+            for name in idb.hostnames:
+                temp.append(name)
+    success_list = temp
+
     if len(success_list) != 0:
         utils.output_to_dest(success_list, out_dest)  # writing to destination (stdout by default)
     if len(failure_list) != 0:
@@ -102,7 +102,7 @@ def start_scan(ips: list, cvss_threshold: float = None):
     return success_list, failure_list
 
 
-def start(targets: list, out_dest: str, db_enabled: bool, cvss_threshold: float = None, ipv6: bool = False):
+def start(targets: list, out_dest: str, db_enabled: bool, cvss_threshold: float = None, output_option: bool = False, ipv6: bool = False):
     """
     entry point for InternetDBService
     """
@@ -118,7 +118,7 @@ def start(targets: list, out_dest: str, db_enabled: bool, cvss_threshold: float 
             db.commit()
         else:  # write to file or stdout
             if len(success_list) != 0 or len(failure_list) != 0:
-                write_result(success_list, failure_list, out_dest)
+                write_result(success_list, failure_list, out_dest, output_option)
             else:
                 print(f"No available information from IP range from {to_scan[0]} ... {to_scan[-1]}")
     if db:  # if database is created
