@@ -8,6 +8,8 @@ import requests
 import ipaddress
 import json
 
+from pathlib import Path
+
 
 def internet_db_query(ip: str, timeout: int = 50):
     api = "https://internetdb.shodan.io/"
@@ -132,6 +134,10 @@ def jsonify_objs(objs: list[any]):
     return json_list
 
 
+def file_exists(file_path: str):
+    return Path(file_path).is_file()
+
+
 @contextlib.contextmanager
 def smart_open(file_path: str = None):
     """
@@ -140,12 +146,13 @@ def smart_open(file_path: str = None):
     if not file_path or file_path == "stdout":
         fd = sys.stdout
     else:
-        fd = open(file_path, "w")
+        fd = open(file_path, "a" if file_exists(file_path) else "w")
 
     try:
         yield fd
     finally:
-        fd.close()
+        if fd != sys.stdout:  # do not close stdout
+            fd.close()
 
 
 def output_to_dest(success_list: list, dest: str):
@@ -160,3 +167,6 @@ def output_to_dest(success_list: list, dest: str):
                 print(str(item), file=fd)
         elif "json" in dest:
             json.dump(jsonify_objs(success_list), fp=fd, indent=4, sort_keys=True)
+
+        if fd == sys.stdout:
+            print("=" * 20)

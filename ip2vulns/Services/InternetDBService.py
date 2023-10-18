@@ -64,11 +64,11 @@ def write_result(success_list: list, failure_list: list, out_dest: str, output_o
     :param out_dest: output destionation, default output to stdout
     """
     temp = []
-    if output_option:
+    if output_option:  # hostnames only
         for idb in success_list:
             for name in idb.hostnames:
                 temp.append(name)
-    success_list = temp
+        success_list = temp
 
     if len(success_list) != 0:
         utils.output_to_dest(success_list, out_dest)  # writing to destination (stdout by default)
