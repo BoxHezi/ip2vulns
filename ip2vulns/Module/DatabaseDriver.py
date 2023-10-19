@@ -1,5 +1,3 @@
-import os
-
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
@@ -12,8 +10,6 @@ class Database:
             db_name = "internetdb.db"
         db_path = db_name[:db_name.rfind('/') + 1] if db_name.rfind("/") != -1 else "./"
         utils.create_path(db_path)
-        # if not os.path.exists(db_path):
-        #     utils.create_path(db_path)
         db = db_engine + db_name
         self.__engine = create_engine(db, echo=utils.debug_mode())
         Session = sessionmaker(bind=self.__engine)
