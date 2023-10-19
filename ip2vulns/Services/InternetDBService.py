@@ -59,7 +59,7 @@ def filter_cvss(idb: InternetDB, cvss_threshold: float = None):
     return False
 
 
-def write_result(success_list: list, failure_list: list, out_dest: str):
+def write_result(success_list: list, failure_list: list, out_dest: str, out_index: int):
     """
     display result
     :param success_list: list of InternetDB instance
@@ -67,7 +67,7 @@ def write_result(success_list: list, failure_list: list, out_dest: str):
     :param out_dest: output destionation, default output to stdout
     """
     if len(success_list) != 0:
-        utils.output_to_dest(success_list, out_dest)  # writing to destination (stdout by default)
+        utils.output_to_dest(success_list, out_dest, out_index)  # writing to destination (stdout by default)
     if len(failure_list) != 0:
         print("Exception happened during following IP addresses: ")
         for ip in failure_list:
@@ -104,9 +104,9 @@ def start(targets: list, out_dest: str, db_enabled: bool, cvss_threshold: float 
     """
     db = Database(out_dest, model=InternetDB) if db_enabled else None
     to_scan_list = utils.split_list(list_to_ips(targets, ipv6))
-    for to_scan in to_scan_list:
-        success_list, failure_list = start_scan(to_scan, cvss_threshold, hostnames_only)
-        if db_enabled:  # write to database
+    for i in range(len(to_scan_list)):
+        success_list, failure_list = start_scan(to_scan_list[i], cvss_threshold, hostnames_only)
+        if db:  # write to database
             dao = InternetDBDAO(db)
             for idb in success_list:  # type(idb) => InternetDB instance
                 idb.format_data_for_db()
@@ -114,8 +114,8 @@ def start(targets: list, out_dest: str, db_enabled: bool, cvss_threshold: float 
             db.commit()
         else:  # write to file or stdout
             if len(success_list) != 0 or len(failure_list) != 0:
-                write_result(success_list, failure_list, out_dest)
+                write_result(success_list, failure_list, out_dest, i)
             else:
-                print(f"No available information from IP range from {to_scan[0]} ... {to_scan[-1]}")
+                print(f"No available information from IP range from {to_scan_list[i][0]} ... {to_scan_list[i][-1]}")
     if db:  # if database is created
         db.close()
