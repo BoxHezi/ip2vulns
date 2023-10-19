@@ -1,14 +1,14 @@
 import os
 import sys
 import contextlib
+from pathlib import Path
 
 import datetime
 import requests
 
 import ipaddress
 import json
-
-from pathlib import Path
+import re
 
 
 def internet_db_query(ip: str, timeout: int = 50):
@@ -25,13 +25,27 @@ def get_now_datetime():
     return datetime.datetime.now()
 
 
+def datetime_2_str(dt: datetime.datetime, replace_whitespace: bool = True) -> str:
+    """
+    convert datetime object to str
+    :param dt: datetime.datetime instance
+    :param replace_whitespace: replace whitespace to underscore
+    :return: datetime.datetime instance string format
+    """
+    out = str(dt)
+    if replace_whitespace:
+        out = out.replace(" ", "_")
+    return out
+
+
 def is_cidr(s: str):
     """
     check if given string is cidr format
     :param s: string to check
     :return: True if in cidr format, False otherwise
     """
-    return "/" in s
+    CIDR_PATTERN = r"\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\/\d{1,2}"
+    return re.match(CIDR_PATTERN, s)
 
 
 def cidr2ip(cidr: str, t6: bool = False) -> list:
@@ -73,15 +87,12 @@ def list_2_str(ls: list, delimiter: str = ",") -> str:
     return '' if len(ls) == 0 else delimiter.join(str(i) for i in ls)
 
 
-def str_2_list(string: str, delimiter: str = ",") -> list:
-    return string.split(delimiter)
-
-
 def split_list(ls: list, size: int = 256) -> list[list]:
     """
     split list into a fixed size of chunks
     :param ls: list to be processed
     :param size: size to be splited into
+    :return: a list of ip_list, each ip_list contains maximum size of IP addresses
     """
     return [ls[i: i + size] for i in range(0, len(ls), size)]
 

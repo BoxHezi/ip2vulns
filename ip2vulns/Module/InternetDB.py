@@ -25,7 +25,7 @@ class InternetDB(declarative_base()):
         self.cpes = data["cpes"]
         self.vulns = data["vulns"]
         self.tags = data["tags"]
-        self.last_updated = str(utils.get_now_datetime()).replace(" ", "_")
+        self.last_updated = utils.get_now_datetime()
 
     def __repr__(self):
         out = f"IP: {self.ip_str}\n"
@@ -35,6 +35,7 @@ class InternetDB(declarative_base()):
         return out
 
     def __str__(self):
+        self.last_updated = utils.datetime_2_str(self.last_updated)
         out = []
         for k, v in vars(self).items():
             if not k.startswith("_"):

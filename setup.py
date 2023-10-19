@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="ip2vulns",
-    version="0.5.7",
+    version="0.5.7-1",
     packages=find_packages(),
     author="Box Hezi",
     author_email="hezipypi.yixdpu@bumpmail.io",

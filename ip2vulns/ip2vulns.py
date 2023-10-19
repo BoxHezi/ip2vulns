@@ -34,7 +34,7 @@ def main():
     if args.internetdb:  # type(internetdb) => list
         InternetDBService.start(args.internetdb, args.out, args.database, args.cvss, args.ho)
 
-    if args.downloaddb:
+    if args.downloaddb:  # download CAPEC and CWE database
         CVEService.download_local_db()
 
 

@@ -17,7 +17,7 @@ def list_to_ips(ls, ipv6: bool = False) -> list:
     convert input list (either IPs or cidr, or both) to list of ip
     :param ls: list to convert
     :param ipv6: use IPv6 if True. Default set to False
-    :return:
+    :return: a list contains IP addresses
     """
     output = []
     for i in ls:
@@ -41,7 +41,7 @@ def query_idb(ip):
     return InternetDB(resp_json)
 
 
-def filter_cvss(idb: InternetDB, cvss_threshold: float = None):
+def filter_cvss(idb: InternetDB, cvss_threshold: float = None) -> bool:
     """
     filter ls based on given cvss score, if cvss score of given cve is higher then cvss threshold score, append it to list
     :param ls: list of InternetDB instance
