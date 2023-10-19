@@ -66,6 +66,9 @@ def write_result(success_list: list, failure_list: list, out_dest: str, out_inde
     :param failure_list: list of IP when exception happened during querying from shodan internetdb api
     :param out_dest: output destionation, default output to stdout
     """
+    out_path = out_dest[:out_dest.rfind("/") + 1] if out_dest.rfind("/") != -1 else "./"
+    utils.create_path(out_path)
+
     if len(success_list) != 0:
         utils.output_to_dest(success_list, out_dest, out_index)  # writing to destination (stdout by default)
     if len(failure_list) != 0:

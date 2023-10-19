@@ -104,7 +104,8 @@ def nvd_key():
 
 def create_path(path: str):
     try:
-        os.mkdir(path)
+        p = Path(path)
+        p.mkdir(parents=True, exist_ok=True)
     except Exception as _:
         print(f"Cannot make directory {path}")
 
@@ -134,10 +135,6 @@ def jsonify_objs(objs: list[any]):
     return json_list
 
 
-def file_exists(file_path: str):
-    return Path(file_path).is_file()
-
-
 @contextlib.contextmanager
 def smart_open(file_path: str = None):
     """
@@ -146,7 +143,7 @@ def smart_open(file_path: str = None):
     if not file_path or file_path == "stdout":
         fd = sys.stdout
     else:
-        fd = open(file_path, "a" if file_exists(file_path) else "w")
+        fd = open(file_path, "w")
 
     try:
         yield fd
@@ -161,6 +158,7 @@ def output_to_dest(success_list: list, dest: str, out_index: int):
     :param success_list: list of ip addresses contains information
     :param dest: destination to write to
     """
+    # construct output file name
     output_dest = dest[:dest.rfind(".")] + f"_{out_index}" + dest[dest.rfind("."):]
 
     with smart_open(output_dest) as fd:  # fd: file descriptor

@@ -25,6 +25,7 @@ class InternetDB(declarative_base()):
         self.cpes = data["cpes"]
         self.vulns = data["vulns"]
         self.tags = data["tags"]
+        self.last_updated = str(utils.get_now_datetime()).replace(" ", "_")
 
     def __repr__(self):
         out = f"IP: {self.ip_str}\n"

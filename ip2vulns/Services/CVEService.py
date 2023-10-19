@@ -13,7 +13,7 @@ import nvdlib
 
 # CVE Github Repo: https://github.com/CVEProject/cvelistV5
 
-# global cve cvss dictionary, avoiding depulicated query from NVD api
+# global cve cvss dictionary, avoiding depulicated query from NVD api (i.e. local cve cvss cache)
 cve_cvss_db = {}
 
 
@@ -21,8 +21,12 @@ def cve_query_nvd(cve_id: str, threshold: float = None, key: str = None):
     """
     query cve information from NIST NVD
     request a key is highly recommended
+    :param cve_id: CVE ID, CVE-YYYY-XXXX
+    :param threshold: cvss score threshold
+    :param key: NVD api key
+    :return: True if cvss of corresponding cve is greater than threshold (or None); False otherwise
     """
-    if cve_id in cve_cvss_db:
+    if cve_id in cve_cvss_db:  # checking local cve cvss cache
         score = cve_cvss_db[cve_id][1]
         return float(score) > float(threshold)
 
