@@ -9,6 +9,7 @@ import requests
 import ipaddress
 import json
 import re
+import nvdlib
 
 
 def internet_db_query(ip: str, timeout: int = 50):
@@ -179,3 +180,31 @@ def output_to_dest(success_list: list, dest: str, out_index: int):
         elif dest.endswith(".json"):
             json.dump(jsonify_objs(success_list), fp=fd, indent=4, sort_keys=True)
 
+
+def object_2_json(obj) -> dict:
+    """
+    convert obj into json/python dict format
+    :param obj: object to be processed
+    :return: dict formatted variable
+    """
+    out = {}
+    if isinstance(obj, dict):  # dict can be convert to json directly
+        return obj
+    entry = {}
+    try:
+        entry = vars(obj)
+    except:
+        return obj
+
+    for k, v in entry.items():
+        if isinstance(v, list):
+            value = []
+            for item in v:
+                value.append(object_2_json(item))
+            out.update({k: value})
+        elif isinstance(v, nvdlib.classes.CVE):
+            value = object_2_json(v)
+            out.update({k: value})
+        else:
+            out.update({k: v})
+    return out

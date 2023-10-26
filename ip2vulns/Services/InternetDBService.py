@@ -2,6 +2,7 @@ from tqdm import tqdm
 
 from ..Module.InternetDB import InternetDB, InternetDBDAO
 from ..Module.DatabaseDriver import Database
+from ..Module.CVEDB import CVEDB
 from .. import utils
 
 from . import CVEService
@@ -41,19 +42,19 @@ def query_idb(ip):
     return InternetDB(resp_json)
 
 
-def filter_cvss(idb: InternetDB, cvss_threshold: float = None) -> bool:
+def filter_cvss(idb: InternetDB, cve_db: CVEDB, cvss_threshold: float = None) -> bool:
     """
     filter ls based on given cvss score, if cvss score of given cve is higher then cvss threshold score, append it to list
     :param ls: list of InternetDB instance
     :param cvss_threshold: cvss score threshold
     :return: True if idb contains CVE which has cvss score greater than cvss_threshold
     """
-    if cvss_threshold is None:
+    if cvss_threshold == 0.0:
         return True
 
     cves = idb.vulns
     for cve_id in cves:
-        potential_target = CVEService.cve_query_nvd(cve_id, threshold=cvss_threshold, key=os.getenv("NVD_KEY"))
+        potential_target = CVEService.cve_query_nvd(cve_id, cve_db, threshold=cvss_threshold, key=os.getenv("NVD_KEY"))
         if potential_target:
             return True
     return False
@@ -78,7 +79,7 @@ def write_result(success_list: list, failure_list: list, out_dest: str, out_inde
             print(ip)
 
 
-def start_scan(ips: list, cvss_threshold: float = None, hostnames_only: bool = False):
+def start_scan(ips: list, cvss_threshold: float = 0, hostnames_only: bool = False):
     """
     start scanning
     :param ips: list of ip to scan
@@ -88,10 +89,11 @@ def start_scan(ips: list, cvss_threshold: float = None, hostnames_only: bool = F
     print(f"Querying ip information from {ips[0]} ... {ips[-1]}")
     success_list = []  # contains InternetDB instance
     failure_list = []  # contains ip address
+    cve_db = CVEDB()
     for ip in tqdm(ips):
         try:
             idb_info = query_idb(ip)
-            if idb_info and filter_cvss(idb_info, cvss_threshold):
+            if idb_info and filter_cvss(idb_info, cve_db, cvss_threshold):
                 if hostnames_only:
                     success_list += idb_info.hostnames
                 else:
@@ -102,7 +104,7 @@ def start_scan(ips: list, cvss_threshold: float = None, hostnames_only: bool = F
     return success_list, failure_list
 
 
-def start(targets: list, out_dest: str, db_enabled: bool, cvss_threshold: float = None, hostnames_only: bool = False, ipv6: bool = False):
+def start(targets: list, out_dest: str, db_enabled: bool, cvss_threshold: float = 0, hostnames_only: bool = False, ipv6: bool = False):
     """
     entry point for InternetDBService
     """

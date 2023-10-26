@@ -4,6 +4,9 @@ from io import BytesIO
 
 import nvdlib
 
+from .. import utils
+from ..Module.CVEDB import CVE, CVEDB
+
 
 # NIST NVD CVE API reference: https://nvd.nist.gov/developers/vulnerabilities
 # NVDLib Documentation: https://nvdlib.com/en/latest/v1/v1.html#search-cpe
@@ -13,11 +16,8 @@ import nvdlib
 
 # CVE Github Repo: https://github.com/CVEProject/cvelistV5
 
-# global cve cvss dictionary, avoiding depulicated query from NVD api (i.e. local cve cvss cache)
-cve_cvss_db = {}
 
-
-def cve_query_nvd(cve_id: str, threshold: float = None, key: str = None):
+def cve_query_nvd(cve_id: str, cve_db: CVEDB, threshold: float = None, key: str = None):
     """
     query cve information from NIST NVD
     request a key is highly recommended
@@ -26,13 +26,20 @@ def cve_query_nvd(cve_id: str, threshold: float = None, key: str = None):
     :param key: NVD api key
     :return: True if cvss of corresponding cve is greater than threshold (or None); False otherwise
     """
-    if cve_id in cve_cvss_db:  # checking local cve cvss cache
-        score = cve_cvss_db[cve_id][1]
-        return float(score) > float(threshold)
+    print(f"Querying CVE: {cve_id}")
+    cve_record = cve_db.get_cve_by_id(cve_id)
+    if cve_record:
+        score = cve_db.get_cvss_score_by_cve(cve_record)
+        return float(score[1]) >= float(threshold)
 
     cve_info = list(nvdlib.searchCVE_V2(cveId=cve_id, key=key, delay=2 if key else 6))[0]
-    cve_cvss_db[cve_id] = cve_info.score
-    return float(cve_info.score[1]) > float(threshold)
+    try:
+        cve_obj = CVE(utils.object_2_json(cve_info))  # convert nvdlib result to CVE instance
+        cve_db.upsert(cve_obj)
+    except Exception as e:
+        print(e)
+    # return float(cve_info.score[1]) > float(threshold)
+    return float(cve_obj.get_score()[1]) >= float(threshold)
 
 
 def download_local_db():

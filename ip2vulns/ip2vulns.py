@@ -32,7 +32,7 @@ def main():
         args.internetdb = utils.read_from_pipe()
 
     if args.internetdb:  # type(internetdb) => list
-        InternetDBService.start(args.internetdb, args.out, args.database, args.cvss, args.ho)
+        InternetDBService.start(args.internetdb, args.out, args.database, 0 if not args.cvss else args.cvss, args.ho)
 
     if args.downloaddb:  # download CAPEC and CWE database
         CVEService.download_local_db()
