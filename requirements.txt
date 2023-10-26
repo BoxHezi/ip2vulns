@@ -4,3 +4,4 @@ nvdlib
 ares
 tqdm
 setuptools
+tinydb

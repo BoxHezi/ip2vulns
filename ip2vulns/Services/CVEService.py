@@ -17,16 +17,18 @@ from ..Module.CVEDB import CVE, CVEDB
 # CVE Github Repo: https://github.com/CVEProject/cvelistV5
 
 
-def cve_query_nvd(cve_id: str, cve_db: CVEDB, threshold: float = None, key: str = None):
+def cve_query_nvd(cve_id: str, cve_db: CVEDB, threshold: float = 0, key: str = None):
     """
     query cve information from NIST NVD
+    First check if there matched record in local database, if no query from NIST NVD
     request a key is highly recommended
     :param cve_id: CVE ID, CVE-YYYY-XXXX
+    :param cve_db: The local database to query and update
     :param threshold: cvss score threshold
     :param key: NVD api key
-    :return: True if cvss of corresponding cve is greater than threshold (or None); False otherwise
+    :return: True if the CVSS score of the CVE is greater than or equal to the threshold, False otherwise.
     """
-    print(f"Querying CVE: {cve_id}")
+    # print(f"Querying CVE: {cve_id}")
     cve_record = cve_db.get_cve_by_id(cve_id)
     if cve_record:
         score = cve_db.get_cvss_score_by_cve(cve_record)
@@ -38,7 +40,6 @@ def cve_query_nvd(cve_id: str, cve_db: CVEDB, threshold: float = None, key: str 
         cve_db.upsert(cve_obj)
     except Exception as e:
         print(e)
-    # return float(cve_info.score[1]) > float(threshold)
     return float(cve_obj.get_score()[1]) >= float(threshold)
 
 

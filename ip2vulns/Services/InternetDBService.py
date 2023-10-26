@@ -42,16 +42,13 @@ def query_idb(ip):
     return InternetDB(resp_json)
 
 
-def filter_cvss(idb: InternetDB, cve_db: CVEDB, cvss_threshold: float = None) -> bool:
+def filter_cvss(idb: InternetDB, cve_db: CVEDB, cvss_threshold: float = 0) -> bool:
     """
     filter ls based on given cvss score, if cvss score of given cve is higher then cvss threshold score, append it to list
     :param ls: list of InternetDB instance
     :param cvss_threshold: cvss score threshold
     :return: True if idb contains CVE which has cvss score greater than cvss_threshold
     """
-    if cvss_threshold == 0.0:
-        return True
-
     cves = idb.vulns
     for cve_id in cves:
         potential_target = CVEService.cve_query_nvd(cve_id, cve_db, threshold=cvss_threshold, key=os.getenv("NVD_KEY"))

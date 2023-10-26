@@ -18,12 +18,23 @@ class CVEDB:
         self.table = self.db.table(table_name)
 
     def upsert(self, data: CVE, table = None):
+        """
+        Inserts a new record or updates an existing record in the database
+        :param data: An instance of the CVE class
+        :param table: The table in which to perform the operation. Defaults to self.table
+        """
         if table is None:
             table = self.table
         cve = Query()
         table.upsert(vars(data), cve.id == vars(data)["id"])
 
     def get_cve_by_id(self, cve_id, table = None):
+        """
+        Retrieves a CVE record from the database using a given CVE ID
+        :param cve_id: CVE ID to search for, CVE-YYYY-XXXX
+        :param table: The table in which to perform the operation. Defaults to self.table
+        :return: A CVE object created from the matching record, or None if no matching record is found
+        """
         if table is None:
             table = self.table
         cve = Query()
