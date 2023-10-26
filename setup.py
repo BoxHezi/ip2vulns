@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="ip2vulns",
-    version="0.5.8",
+    version="0.5.8-1",
     packages=find_packages(),
     author="Box Hezi",
     author_email="hezipypi.yixdpu@bumpmail.io",
@@ -12,7 +12,8 @@ setup(
         "requests",
         "nvdlib",
         "ares",
-        "tqdm"
+        "tqdm",
+        "tinydb"
     ],
     entry_points={
         'console_scripts': [

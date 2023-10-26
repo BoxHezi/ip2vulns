@@ -42,17 +42,21 @@ def query_idb(ip):
     return InternetDB(resp_json)
 
 
-def filter_cvss(idb: InternetDB, cve_db: CVEDB, cvss_threshold: float = 0) -> bool:
+def filter_cvss(idb: InternetDB, cve_db: CVEDB, cvss_threshold: float) -> bool:
     """
     filter ls based on given cvss score, if cvss score of given cve is higher then cvss threshold score, append it to list
     :param ls: list of InternetDB instance
     :param cvss_threshold: cvss score threshold
     :return: True if idb contains CVE which has cvss score greater than cvss_threshold
     """
+    # if not cvss score is specified, or 0 is given, return True
+    if not cvss_threshold or float(cvss_threshold) == 0:
+        return True
+
     cves = idb.vulns
     for cve_id in cves:
-        potential_target = CVEService.cve_query_nvd(cve_id, cve_db, threshold=cvss_threshold, key=os.getenv("NVD_KEY"))
-        if potential_target:
+        cve = CVEService.get_cve_by_id(cve_id, cve_db)
+        if float(cve.get_score()[1]) >= float(cvss_threshold):
             return True
     return False
 
@@ -76,7 +80,7 @@ def write_result(success_list: list, failure_list: list, out_dest: str, out_inde
             print(ip)
 
 
-def start_scan(ips: list, cvss_threshold: float = 0, hostnames_only: bool = False):
+def start_scan(ips: list, cvss_threshold: float, hostnames_only: bool = False):
     """
     start scanning
     :param ips: list of ip to scan
@@ -101,7 +105,7 @@ def start_scan(ips: list, cvss_threshold: float = 0, hostnames_only: bool = Fals
     return success_list, failure_list
 
 
-def start(targets: list, out_dest: str, db_enabled: bool, cvss_threshold: float = 0, hostnames_only: bool = False, ipv6: bool = False):
+def start(targets: list, out_dest: str, db_enabled: bool, cvss_threshold: float, hostnames_only: bool = False, ipv6: bool = False):
     """
     entry point for InternetDBService
     """

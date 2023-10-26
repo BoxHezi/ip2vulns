@@ -1,6 +1,7 @@
 import requests
 from zipfile import ZipFile
 from io import BytesIO
+from typing import Optional
 
 import nvdlib
 
@@ -17,30 +18,29 @@ from ..Module.CVEDB import CVE, CVEDB
 # CVE Github Repo: https://github.com/CVEProject/cvelistV5
 
 
-def cve_query_nvd(cve_id: str, cve_db: CVEDB, threshold: float = 0, key: str = None):
+def get_cve_by_id(cve_id: str, cve_db: CVEDB, key: str = utils.get_nvd_key()) -> Optional[CVE]:
     """
     query cve information from NIST NVD
     First check if there matched record in local database, if no query from NIST NVD
     request a key is highly recommended
-    :param cve_id: CVE ID, CVE-YYYY-XXXX
+    :param cve_id: CVE ID to query, in the format of CVE-YYYY-XXXX
     :param cve_db: The local database to query and update
-    :param threshold: cvss score threshold
     :param key: NVD api key
-    :return: True if the CVSS score of the CVE is greater than or equal to the threshold, False otherwise.
+    :return: The CVE instance if the process is successful, None otherwise
     """
     # print(f"Querying CVE: {cve_id}")
-    cve_record = cve_db.get_cve_by_id(cve_id)
+    cve_record = cve_db.get_cve_by_id(cve_id)  # get cve record from local cve database
     if cve_record:
-        score = cve_db.get_cvss_score_by_cve(cve_record)
-        return float(score[1]) >= float(threshold)
+        return cve_record
 
-    cve_info = list(nvdlib.searchCVE_V2(cveId=cve_id, key=key, delay=2 if key else 6))[0]
+    cve_info = list(nvdlib.searchCVE_V2(cveId=cve_id, key=key, delay=2 if key else None))[0]
     try:
         cve_obj = CVE(utils.object_2_json(cve_info))  # convert nvdlib result to CVE instance
         cve_db.upsert(cve_obj)
+        return cve_obj
     except Exception as e:
         print(e)
-    return float(cve_obj.get_score()[1]) >= float(threshold)
+    return None
 
 
 def download_local_db():

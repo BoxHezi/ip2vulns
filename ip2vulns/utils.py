@@ -106,12 +106,13 @@ def debug_mode():
     return bool(os.getenv("DEBUG"))
 
 
-def nvd_key():
+def get_nvd_key():
     """
     get NVD_KEY from environment varialbe
     :return: NVD_KEY if key exists, None otherwise
     """
-    return os.getenv("NVD_KEY")
+    key = os.getenv("NVD_KEY")
+    return key if key != "" else None
 
 
 def create_path(path: str):
