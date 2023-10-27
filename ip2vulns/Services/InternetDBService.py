@@ -4,10 +4,7 @@ from ..Module.InternetDB import InternetDB, InternetDBDAO
 from ..Module.DatabaseDriver import Database
 from ..Module.CVEDB import CVEDB
 from .. import utils
-
 from . import CVEService
-
-import os
 
 
 # ref: https://internetdb.shodan.io/
@@ -102,6 +99,7 @@ def start_scan(ips: list, cvss_threshold: float, hostnames_only: bool = False):
         except Exception as e:
             print(f"Exception: {e} while querying {ip}")
             failure_list.append(ip)
+    cve_db.close()
     return success_list, failure_list
 
 

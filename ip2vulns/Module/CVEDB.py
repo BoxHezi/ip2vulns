@@ -46,3 +46,6 @@ class CVEDB:
 
     def get_cvss_score_by_cve(self, cve: CVE):
         return cve.get_score()
+
+    def close(self):
+        self.db.close()
