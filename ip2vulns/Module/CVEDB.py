@@ -1,5 +1,7 @@
 from pathlib import Path
 from tinydb import TinyDB, Query
+from tinydb.storages import JSONStorage
+from tinydb.middlewares import CachingMiddleware
 
 from .. import utils
 
@@ -20,7 +22,8 @@ class CVE:
 class CVEDB:
     def __init__(self, db_file = "cve_db.json", db_path = str(Path.home()) + "/.config/ip2vulns/", table_name = "cve"):
         utils.create_path(db_path)
-        self.db = TinyDB(db_path + db_file)
+        storage_path = db_path + db_file
+        self.db = TinyDB(storage_path, storage=CachingMiddleware(JSONStorage))
         self.table = self.db.table(table_name)
 
     def upsert(self, data: CVE, table = None):
@@ -54,4 +57,7 @@ class CVEDB:
         return cve.get_attribute("score")
 
     def close(self):
-        self.db.close()
+        try:
+            self.db.close()
+        except Exception as e:
+            print(f"Exception when closing database: {self.db} - {e}")

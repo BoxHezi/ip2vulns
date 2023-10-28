@@ -2,6 +2,7 @@ import requests
 from zipfile import ZipFile
 from io import BytesIO
 from typing import Optional
+import time
 
 import nvdlib
 
@@ -33,7 +34,7 @@ def get_cve_by_id(cve_id: str, cve_db: CVEDB, key: str = utils.get_nvd_key()) ->
     if cve_record:
         return cve_record
 
-    cve_info = list(nvdlib.searchCVE_V2(cveId=cve_id, key=key, delay=2 if key else None))[0]
+    cve_info = list(nvdlib.searchCVE_V2(cveId=cve_id, key=key, delay=utils.nvd_delay(key)))[0]
     cve_obj = None
     try:
         cve_obj = CVE(utils.object_2_json(cve_info))  # convert nvdlib result to CVE instance

@@ -46,17 +46,19 @@ def filter_cvss(idb: InternetDB, cve_db: CVEDB, cvss_threshold: float) -> bool:
     :param cvss_threshold: cvss score threshold
     :return: True if idb contains CVE which has cvss score greater than cvss_threshold
     """
-    # if not cvss score is specified, or 0 is given, return True
-    if not cvss_threshold or float(cvss_threshold) == 0:
+    # if not cvss score is specified return True
+    if not cvss_threshold:
         return True
 
     cves = idb.vulns
+    is_potential_target = False
     for cve_id in cves:
         cve = CVEService.get_cve_by_id(cve_id, cve_db)
-        # if float(cve.get_score()[1]) >= float(cvss_threshold):
         if float(cve.get_attribute("score")[1]) >= float(cvss_threshold):
-            return True
-    return False
+            is_potential_target = True
+            if float(cvss_threshold) != 0: # when 0 is given, loop through all CVEs
+                return True
+    return is_potential_target
 
 
 def write_result(success_list: list, failure_list: list, out_dest: str, out_index: int):

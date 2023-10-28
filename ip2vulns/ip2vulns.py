@@ -15,8 +15,8 @@ def init_argparse():
     arg.add_argument("-o", "--out", help="Define output file, default print to stdout\n"
                                          "Available option: stdout (default), csv, json\n"
                                          "Note: if -db flag is enabled, -out option will be disabled")
-    arg.add_argument("-s", "--cvss", help="enable cvss score filter, required a number\n"
-                                           "")
+    arg.add_argument("-s", "--cvss", help="Enable cvss score filter, required a number\n"
+                                          "If 0 is given, targets found with no CVE information will be filtered out. And all CVEs will be checked.")
     arg.add_argument("-d", "--database", help="Write result to database\n"
                                                "if no -o flag is provide, write data to internetdb.db in the same directory",
                     action="store_true")

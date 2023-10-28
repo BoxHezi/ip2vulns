@@ -2,6 +2,7 @@ import os
 import sys
 import contextlib
 from pathlib import Path
+from typing import Optional
 
 import datetime
 import requests
@@ -113,6 +114,15 @@ def get_nvd_key():
     """
     key = os.getenv("NVD_KEY")
     return key if key != "" else None
+
+
+def nvd_delay(key) -> Optional[int]:
+    """
+    get NIST NVD API dalay, if NVD KEY is present, set delay to 2 seconds
+    :param key: NVD KEY
+    :return: delay duration
+    """
+    return 2 if key else None
 
 
 def create_path(path: str):
