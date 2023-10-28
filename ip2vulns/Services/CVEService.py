@@ -34,13 +34,13 @@ def get_cve_by_id(cve_id: str, cve_db: CVEDB, key: str = utils.get_nvd_key()) ->
         return cve_record
 
     cve_info = list(nvdlib.searchCVE_V2(cveId=cve_id, key=key, delay=2 if key else None))[0]
+    cve_obj = None
     try:
         cve_obj = CVE(utils.object_2_json(cve_info))  # convert nvdlib result to CVE instance
         cve_db.upsert(cve_obj)
-        return cve_obj
     except Exception as e:
-        print(e)
-    return None
+        print(f"Exception: {e}")
+    return cve_obj
 
 
 def download_local_db():

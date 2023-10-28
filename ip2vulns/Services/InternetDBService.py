@@ -53,7 +53,8 @@ def filter_cvss(idb: InternetDB, cve_db: CVEDB, cvss_threshold: float) -> bool:
     cves = idb.vulns
     for cve_id in cves:
         cve = CVEService.get_cve_by_id(cve_id, cve_db)
-        if float(cve.get_score()[1]) >= float(cvss_threshold):
+        # if float(cve.get_score()[1]) >= float(cvss_threshold):
+        if float(cve.get_attribute("score")[1]) >= float(cvss_threshold):
             return True
     return False
 

@@ -1,5 +1,6 @@
 import argparse
 
+from . import version
 from . import utils
 from .Services import InternetDBService, CVEService
 
@@ -23,6 +24,7 @@ def init_argparse():
                      action="store_true")
     arg.add_argument("--ho", help="Output hostnames only for scan result.\n"
                      "This option DOES NOT apply to -d/--database option", action="store_true")
+    arg.add_argument("-v", "--version", help="Print current version", action="store_true")
     return arg
 
 
@@ -36,6 +38,9 @@ def main():
 
     if args.downloaddb:  # download CAPEC and CWE database
         CVEService.download_local_db()
+
+    if args.version:
+        print(version.__version__)
 
 
 if __name__ == "__main__":

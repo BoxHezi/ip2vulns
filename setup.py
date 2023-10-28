@@ -1,8 +1,9 @@
 from setuptools import setup, find_packages
+from ip2vulns.version import __version__
 
 setup(
     name="ip2vulns",
-    version="0.5.8-1",
+    version=__version__,
     packages=find_packages(),
     author="Box Hezi",
     author_email="hezipypi.yixdpu@bumpmail.io",

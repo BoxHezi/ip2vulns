@@ -7,8 +7,14 @@ class CVE:
     def __init__(self, data: dict):
         vars(self).update(data)
 
-    def get_score(self):
-        return vars(self)["score"]
+    def get_attribute(self, attribute: str):
+        """
+        get attributes for the CVE instance
+        :param attribute: attribute value to retrieve
+        :return: value corresponding to the attribute, None if no such attribute
+        """
+        value = vars(self)[attribute]
+        return value if value else None
 
 
 class CVEDB:
@@ -45,7 +51,7 @@ class CVEDB:
         return CVE(records[0])
 
     def get_cvss_score_by_cve(self, cve: CVE):
-        return cve.get_score()
+        return cve.get_attribute("score")
 
     def close(self):
         self.db.close()
