@@ -9,7 +9,7 @@ def init_argparse():
     arg = argparse.ArgumentParser(description="IP 2 vulneribility tools", formatter_class=argparse.RawTextHelpFormatter)
     arg.add_argument("-inet", "--internetdb", help="Query information from https://internetdb.shodan.io/\n"
                                                    "support multiple ip and cidr, separate using space, "
-                                                   ":e.g. -inet 8.8.8.8 51.83.59.99 192.168.0.0/24\n"
+                                                   "e.g. -inet 8.8.8.8 51.83.59.99 192.168.0.0/24\n"
                                                    "if no database if specified, use ./databases/internetdb.db",
                      nargs="+")
     arg.add_argument("-o", "--out", help="Define output file, default print to stdout\n"

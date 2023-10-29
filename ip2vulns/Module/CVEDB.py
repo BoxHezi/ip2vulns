@@ -48,9 +48,7 @@ class CVEDB:
             table = self.table
         records = table.search(self.query.id.matches(cve_id))
 
-        if len(records) == 0:
-            return None
-        return CVE(records[0])
+        return None if len(records) == 0 else CVE(records[0])
 
     def get_cvss_score_by_cve(self, cve: CVE):
         return cve.get_attribute("score")

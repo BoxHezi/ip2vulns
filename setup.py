@@ -1,6 +1,11 @@
 from setuptools import setup, find_packages
 from ip2vulns.version import __version__
 
+long_desc = ""
+with open("./README.md", "r") as file:
+    for line in file:
+        long_desc += line
+
 setup(
     name="ip2vulns",
     version=__version__,
@@ -8,6 +13,8 @@ setup(
     author="Box Hezi",
     author_email="hezipypi.yixdpu@bumpmail.io",
     description="An IP to vulnerability utility",
+    long_description=long_desc,
+    url="https://github.com/BoxHezi/ip2vulns",
     install_requires=[
         "SQLAlchemy",
         "requests",
