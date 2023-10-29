@@ -2,7 +2,6 @@ import requests
 from zipfile import ZipFile
 from io import BytesIO
 from typing import Optional
-import time
 
 import nvdlib
 

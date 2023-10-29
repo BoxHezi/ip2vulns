@@ -58,6 +58,7 @@ def filter_cvss(idb: InternetDB, cve_db: CVEDB, cvss_threshold: float) -> bool:
             is_potential_target = True
             if float(cvss_threshold) != 0: # when 0 is given, loop through all CVEs
                 return True
+    cve_db.flush()
     return is_potential_target
 
 

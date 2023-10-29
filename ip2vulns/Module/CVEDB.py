@@ -24,6 +24,7 @@ class CVEDB:
         utils.create_path(db_path)
         storage_path = db_path + db_file
         self.db = TinyDB(storage_path, storage=CachingMiddleware(JSONStorage))
+        self.query = Query()
         self.table = self.db.table(table_name)
 
     def upsert(self, data: CVE, table = None):
@@ -34,8 +35,7 @@ class CVEDB:
         """
         if table is None:
             table = self.table
-        cve = Query()
-        table.upsert(vars(data), cve.id == vars(data)["id"])
+        table.upsert(vars(data), self.query.id == vars(data)["id"])
 
     def get_cve_by_id(self, cve_id, table = None):
         """
@@ -46,8 +46,7 @@ class CVEDB:
         """
         if table is None:
             table = self.table
-        cve = Query()
-        records = table.search(cve.id.matches(cve_id))
+        records = table.search(self.query.id.matches(cve_id))
 
         if len(records) == 0:
             return None
@@ -56,7 +55,19 @@ class CVEDB:
     def get_cvss_score_by_cve(self, cve: CVE):
         return cve.get_attribute("score")
 
+    def flush(self):
+        """
+        flush cache to write data to disk
+        """
+        try:
+            self.db.storage.flush()
+        except Exception as e:
+            print(f"Exception when flushing database: {self.db} - {e}")
+
     def close(self):
+        """
+        close database
+        """
         try:
             self.db.close()
         except Exception as e:
