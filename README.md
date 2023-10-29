@@ -36,7 +36,7 @@ options:
   -s CVSS, --cvss CVSS  Enable cvss score filter, required a number
                         If 0 is given, targets found with no CVE information will be filtered out. And all CVEs will be checked.
                         When 0 is given, the process can be slow if huge amount of CVEs are founded. Not Recommend to pass 0 in.
-  -d, --database        Write result to database
+  -d, --database        Write result to database, using SQLite3 database
                         if no -o flag is provide, write data to internetdb.db in the same directory
   --downloaddb          download CAPEC and CWE database, csv file, store in ./databases directory
   --ho                  Output hostnames only for scan result.
@@ -44,10 +44,38 @@ options:
   -v, --version         Print current version
 ```
 
-### verbose SQL output
+# Features
+
+The scan operation will be splitted into several groups. Each group contains maximum 256 IPs.
+
+## Output to file
+
+When no `-o/--out` option is provided, results are printed to stdout.
+
+When providing the `-o/--out` option, results will be written to files.
+Each group's result will be written to separated files. Group index (starting from 0) will be appened to file output filename.
+
+> If 512 IPs are scanned. Results will be written to 2 files.
+> If `-o test.csv` is given, then the output files will be:
+>
+> - test_0.csv
+> - test_1.csv
+
+# Local CVE Database
+
+The project use a local CVE database in order to avoid querying duplicated CVE from NIST NVD.
+
+The local database use [TinyDB](https://github.com/msiemens/tinydb).
+The local database will be stored in `$HOME/.config/ip2vulns/cve_db.json`
+
+> **NOTE: This database is not related to `-d/--database` option.**
+
+### Verbose SQL output
+
 set environment variable `DEBUG` to True to enable SQL verbose output
 In fish shell, use command `set -x DEBUG True` or in bash `export DEBUG=True`.
 
 ### NIST NVD Key
+
 set environment variable `NVD_KEY` for lower delay of NIST NVD api. (Optional, but recommended)
 [Request a key](https://nvd.nist.gov/developers/request-an-api-key)

@@ -18,7 +18,7 @@ def init_argparse():
     arg.add_argument("-s", "--cvss", help="Enable cvss score filter, required a number\n"
                                           "If 0 is given, targets found with no CVE information will be filtered out. And all CVEs will be checked.\n"
                                           "When 0 is given, the process can be slow if huge amount of CVEs are founded. Not Recommend to pass 0 in.")
-    arg.add_argument("-d", "--database", help="Write result to database\n"
+    arg.add_argument("-d", "--database", help="Write result to database, using SQLite3 database\n"
                                                "if no -o flag is provide, write data to internetdb.db in the same directory",
                     action="store_true")
     arg.add_argument("--downloaddb", help="download CAPEC and CWE database, csv file, store in ./databases directory",

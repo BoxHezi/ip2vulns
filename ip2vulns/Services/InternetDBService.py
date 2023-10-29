@@ -76,7 +76,7 @@ def write_result(success_list: list, failure_list: list, out_dest: str, out_inde
     if len(success_list) != 0:
         utils.output_to_dest(success_list, out_dest, out_index)  # writing to destination (stdout by default)
     if len(failure_list) != 0:
-        print("Exception happened during following IP addresses: ")
+        print("\nException happened during following IP addresses: ")
         for ip in failure_list:
             print(ip)
 
