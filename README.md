@@ -55,8 +55,8 @@ When no `-o/--out` option is provided, results are printed to stdout.
 When providing the `-o/--out` option, results will be written to files.
 Each group's result will be written to separated files. Group index (starting from 0) will be appened to file output filename.
 
-> If 512 IPs are scanned. Results will be written to 2 files.
-> If `-o test.csv` is given, then the output files will be:
+> If 512 IPs are going to be scanned. The results will be written to 2 files.
+> If `-o test.csv` is given, then output files will be:
 >
 > - test_0.csv
 > - test_1.csv
@@ -72,10 +72,10 @@ The local database will be stored in `$HOME/.config/ip2vulns/cve_db.json`
 
 ### Verbose SQL output
 
-set environment variable `DEBUG` to True to enable SQL verbose output
+By setting environment variable `DEBUG` to True to enable SQL verbose output
 In fish shell, use command `set -x DEBUG True` or in bash `export DEBUG=True`.
 
-### NIST NVD Key
+### NIST NVD Key (Optional, but recommend)
 
-set environment variable `NVD_KEY` for lower delay of NIST NVD api. (Optional, but recommended)
+By setting environment variable `NVD_KEY` for lower delay of NIST NVD api.
 [Request a key](https://nvd.nist.gov/developers/request-an-api-key)

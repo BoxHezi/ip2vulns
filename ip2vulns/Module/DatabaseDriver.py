@@ -11,7 +11,7 @@ class Database:
         db_path = db_name[:db_name.rfind('/') + 1] if db_name.rfind("/") != -1 else "./"
         utils.create_path(db_path)
         db = db_engine + db_name
-        self.__engine = create_engine(db, echo=utils.debug_mode())
+        self.__engine = create_engine(db, echo=utils.sql_echo())
         Session = sessionmaker(bind=self.__engine)
         model.metadata.create_all(self.__engine)
         self.__session = Session()

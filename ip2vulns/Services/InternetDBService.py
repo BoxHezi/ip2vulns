@@ -41,18 +41,17 @@ def query_idb(ip):
 
 def filter_cvss(idb: InternetDB, cve_db: CVEDB, cvss_threshold: float) -> bool:
     """
-    filter ls based on given cvss score, if cvss score of given cve is higher then cvss threshold score, append it to list
-    :param ls: list of InternetDB instance
+    Filters based on given cvss score, if cvss score of given cve is higher then cvss threshold score, return True
+    :param idb: InternetDB instance
     :param cvss_threshold: cvss score threshold
-    :return: True if idb contains CVE which has cvss score greater than cvss_threshold
+    :return: True if idb contains CVE which has cvss score greater than cvss_threshold, False otherwise
     """
     # if not cvss score is specified return True
     if not cvss_threshold:
         return True
 
-    cves = idb.vulns
     is_potential_target = False
-    for cve_id in cves:
+    for cve_id in idb.vulns:
         cve = CVEService.get_cve_by_id(cve_id, cve_db)
         if float(cve.get_attribute("score")[1]) >= float(cvss_threshold):
             is_potential_target = True

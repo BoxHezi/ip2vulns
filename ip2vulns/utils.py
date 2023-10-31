@@ -22,7 +22,9 @@ def internet_db_query(ip: str, timeout: int = 50):
 def resp_2_json(resp):
     return resp.json()
 
-
+##############################
+# Datetime
+##############################
 def get_now_datetime():
     return datetime.datetime.now()
 
@@ -40,6 +42,9 @@ def datetime_2_str(dt: datetime.datetime, replace_whitespace: bool = True) -> st
     return out
 
 
+##############################
+# CIDR & IP related
+##############################
 def is_cidr(s: str):
     """
     check if given string is cidr format
@@ -80,6 +85,9 @@ def ip_str(ip: int) -> str:
     return str(ipaddress.ip_address(ip))
 
 
+##############################
+# Llist related
+##############################
 def list_2_str(ls: list, delimiter: str = ",") -> str:
     """
     turn list to string, separate by delimiter, default using comma
@@ -99,7 +107,10 @@ def split_list(ls: list, size: int = 256) -> list[list]:
     return [ls[i: i + size] for i in range(0, len(ls), size)]
 
 
-def debug_mode():
+##############################
+# Database SQL Verbose output
+##############################
+def sql_echo():
     """
     check if debug mode is enabled
     :return: True if in debug mode, False otherwise
@@ -107,6 +118,9 @@ def debug_mode():
     return bool(os.getenv("DEBUG"))
 
 
+##############################
+# NIST NVD api
+##############################
 def get_nvd_key():
     """
     get NVD_KEY from environment varialbe
@@ -125,6 +139,9 @@ def nvd_delay(key) -> Optional[int]:
     return 2 if key else None
 
 
+##############################
+# Create path
+##############################
 def create_path(path: str):
     try:
         p = Path(path)
@@ -133,6 +150,9 @@ def create_path(path: str):
         print(f"Cannot make directory {path}")
 
 
+##############################
+# read data from pipe
+##############################
 def has_pipe_data():
     return not os.isatty(sys.stdin.fileno())
 
@@ -141,6 +161,9 @@ def read_from_pipe():
     return [line.strip() for line in sys.stdin.readlines()]
 
 
+##############################
+# convert list of object to json
+##############################
 def jsonify_objs(objs: list[any]):
     """
     convert list of objects to json format
@@ -158,6 +181,9 @@ def jsonify_objs(objs: list[any]):
     return json_list
 
 
+##############################
+# Output utility
+##############################
 @contextlib.contextmanager
 def smart_open(file_path: str = None):
     """
@@ -192,6 +218,9 @@ def output_to_dest(success_list: list, dest: str, out_index: int):
             json.dump(jsonify_objs(success_list), fp=fd, indent=4, sort_keys=True)
 
 
+##############################
+# Convert single object to jsonify-able dictionary
+##############################
 def object_2_json(obj) -> dict:
     """
     convert obj into json/python dict format

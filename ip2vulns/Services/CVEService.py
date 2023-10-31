@@ -20,7 +20,7 @@ from ..Module.CVEDB import CVE, CVEDB
 
 def get_cve_by_id(cve_id: str, cve_db: CVEDB, key: str = utils.get_nvd_key()) -> Optional[CVE]:
     """
-    query cve information from NIST NVD
+    Query cve information from NIST NVD
     First check if there matched record in local database, if no query from NIST NVD
     request a key is highly recommended
     :param cve_id: CVE ID to query, in the format of CVE-YYYY-XXXX
