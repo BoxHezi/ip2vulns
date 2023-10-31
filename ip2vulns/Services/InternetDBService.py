@@ -6,7 +6,6 @@ from ..Module.CVEDB import CVEDB
 from .. import utils
 from . import CVEService
 
-
 # ref: https://internetdb.shodan.io/
 
 
@@ -41,10 +40,12 @@ def query_idb(ip):
 
 def filter_cvss(idb: InternetDB, cve_db: CVEDB, cvss_threshold: float) -> bool:
     """
-    Filters based on given cvss score, if cvss score of given cve is higher then cvss threshold score, return True
-    :param idb: InternetDB instance
-    :param cvss_threshold: cvss score threshold
-    :return: True if idb contains CVE which has cvss score greater than cvss_threshold, False otherwise
+    Filters based on given CVSS score. If the CVSS score of a given CVE is higher than the CVSS threshold score, the function returns True.
+
+    :param idb: An instance of InternetDB.
+    :param cve_db: An instance of CVEDB.
+    :param cvss_threshold: The CVSS score threshold.
+    :return: True if the InternetDB instance contains a CVE which has a CVSS score greater than the CVSS threshold, False otherwise.
     """
     # if not cvss score is specified return True
     if not cvss_threshold:
@@ -63,10 +64,11 @@ def filter_cvss(idb: InternetDB, cve_db: CVEDB, cvss_threshold: float) -> bool:
 
 def write_result(success_list: list, failure_list: list, out_dest: str, out_index: int):
     """
-    display result
-    :param success_list: list of InternetDB instance
-    :param failure_list: list of IP when exception happened during querying from shodan internetdb api
-    :param out_dest: output destionation, default output to stdout
+    Writes the results of the IP scan to the specified output destination. If no destination is specified, results are written to stdout.
+    :param success_list: A list of successful InternetDB instances.
+    :param failure_list: A list of IP addresses where exceptions occurred during querying from the Shodan InternetDB API.
+    :param out_dest: The output destination. If not specified, output is written to stdout.
+    :param out_index: The index of the output file.
     """
     if out_dest:
         out_path = out_dest[:out_dest.rfind("/") + 1] if out_dest.rfind("/") != -1 else "./"
@@ -82,9 +84,10 @@ def write_result(success_list: list, failure_list: list, out_dest: str, out_inde
 
 def start_scan(ips: list, cvss_threshold: float, hostnames_only: bool = False):
     """
-    start scanning
-    :param ips: list of ip to scan
-    :param cvss_threshold: cvss score threshold
+    Scans a list of IP addresses and filters the results based on a given CVSS score threshold
+    :param ips: A list of IP addresses to scan
+    :param cvss_threshold: A list of IP addresses to scan
+    :param hostnames_only: A flag indicating whether to return only hostnames. Defaults to False
     :return: a size 2 tuple, contains success_list and failure_list
     """
     print(f"Querying ip information from {ips[0]} ... {ips[-1]}")
