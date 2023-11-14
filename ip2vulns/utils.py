@@ -176,7 +176,7 @@ def jsonify_objs(objs: list[any]):
         for k, v in vars(obj).items():
             if k.startswith("_"):
                 continue
-            temp[k] = v
+            temp[k] = str(v)
         json_list.append(temp)
     return json_list
 
