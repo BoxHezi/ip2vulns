@@ -86,7 +86,7 @@ def ip_str(ip: int) -> str:
 
 
 ##############################
-# Llist related
+# List related
 ##############################
 def list_2_str(ls: list, delimiter: str = ",") -> str:
     """
@@ -108,17 +108,6 @@ def split_list(ls: list, size: int = 256) -> list[list]:
 
 
 ##############################
-# Database SQL Verbose output
-##############################
-def sql_echo():
-    """
-    check if debug mode is enabled
-    :return: True if in debug mode, False otherwise
-    """
-    return bool(os.getenv("DEBUG"))
-
-
-##############################
 # NIST NVD api
 ##############################
 def get_nvd_key():
@@ -136,7 +125,7 @@ def nvd_delay(key) -> Optional[int]:
     :param key: NVD KEY
     :return: delay duration
     """
-    return 2 if key else None
+    return 1 if key else None
 
 
 ##############################

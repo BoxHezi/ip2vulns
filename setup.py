@@ -17,12 +17,9 @@ setup(
     long_description_content_type="text/markdown",
     url="https://github.com/BoxHezi/ip2vulns",
     install_requires=[
-        "SQLAlchemy",
         "requests",
         "nvdlib",
-        "ares",
         "tqdm",
-        "tinydb"
     ],
     entry_points={
         'console_scripts': [
