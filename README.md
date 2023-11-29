@@ -36,9 +36,6 @@ options:
   -s CVSS, --cvss CVSS  Enable cvss score filter, required a number
                         If 0 is given, targets found with no CVE information will be filtered out. And all CVEs will be checked.
                         When 0 is given, the process can be slow if huge amount of CVEs are founded. Not Recommend to pass 0 in.
-  -d, --database        Write result to database, using SQLite3 database
-                        if no -o flag is provide, write data to internetdb.db in the same directory
-  --downloaddb          download CAPEC and CWE database, csv file, store in ./databases directory
   --ho                  Output hostnames only for scan result.
                         This option DOES NOT apply to -d/--database option
   -v, --version         Print current version
@@ -63,17 +60,8 @@ Each group's result will be written to separated files. Group index (starting fr
 
 # Local CVE Database
 
-The project use a local CVE database in order to avoid querying duplicated CVE from NIST NVD.
-
-The local database use [TinyDB](https://github.com/msiemens/tinydb).
-The local database will be stored in `$HOME/.config/ip2vulns/cve_db.json`
-
-> **NOTE: This database is not related to `-d/--database` option.**
-
-### Verbose SQL output
-
-By setting environment variable `DEBUG` to True to enable SQL verbose output
-In fish shell, use command `set -x DEBUG True` or in bash `export DEBUG=True`.
+Another project named [py-cvedb](https://github.com/BoxHezi/cvedb) is used in this project.
+*It is highly recommended check out that project and init a local database first before using this.*
 
 ### NIST NVD Key (Optional, but recommend)
 
