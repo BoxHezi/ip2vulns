@@ -1,10 +1,9 @@
 from tqdm import tqdm
 
-from ..Module.InternetDB import InternetDB, InternetDBDAO
-from ..Module.DatabaseDriver import Database
-from ..Module.CVEDB import CVEDB
+from ..Module.InternetDB import InternetDB
 from .. import utils
-from . import CVEService
+
+from cvedb import cvedb as db
 
 # ref: https://internetdb.shodan.io/
 
@@ -38,12 +37,12 @@ def query_idb(ip):
     return InternetDB(resp_json)
 
 
-def filter_cvss(idb: InternetDB, cve_db: CVEDB, cvss_threshold: float) -> bool:
+def filter_cvss(idb: InternetDB, cvedb: db.CVEdb, cvss_threshold: float) -> bool:
     """
     Filters based on given CVSS score. If the CVSS score of a given CVE is higher than the CVSS threshold score, the function returns True.
 
     :param idb: An instance of InternetDB.
-    :param cve_db: An instance of CVEDB.
+    :param cvedb: An instance of CVEDB.
     :param cvss_threshold: The CVSS score threshold.
     :return: True if the InternetDB instance contains a CVE which has a CVSS score greater than the CVSS threshold, False otherwise.
     """
@@ -51,15 +50,19 @@ def filter_cvss(idb: InternetDB, cve_db: CVEDB, cvss_threshold: float) -> bool:
     if not cvss_threshold:
         return True
 
-    is_potential_target = False
-    for cve_id in idb.vulns:
-        cve = CVEService.get_cve_by_id(cve_id, cve_db)
-        if float(cve.get_attribute("score")[1]) >= float(cvss_threshold):
-            is_potential_target = True
+    potential_target = False
+    for id in idb.vulns:
+        cve = cvedb.get_cve_by_id(id)
+        cvss = cve.get_cvss_score()
+        if not cvss:
+            print(f"Creating Metrics for CVE: {id}")
+            cve.create_metrics(False)
+            cvss = cve.get_cvss_score()
+        if float(cvss) >= float(cvss_threshold):
+            potential_target = True
             if float(cvss_threshold) != 0: # when 0 is given, loop through all CVEs
                 return True
-    cve_db.flush()
-    return is_potential_target
+    return potential_target
 
 
 def write_result(success_list: list, failure_list: list, out_dest: str, out_index: int):
@@ -82,7 +85,8 @@ def write_result(success_list: list, failure_list: list, out_dest: str, out_inde
             print(ip)
 
 
-def start_scan(ips: list, cvss_threshold: float, hostnames_only: bool = False):
+# def start_scan(ips: list, cvss_threshold: float, hostnames_only: bool = False):
+def start_scan(ips: list, cvedb, cvss_threshold: float, hostnames_only: bool = False):
     """
     Scans a list of IP addresses and filters the results based on a given CVSS score threshold
     :param ips: A list of IP addresses to scan
@@ -93,11 +97,10 @@ def start_scan(ips: list, cvss_threshold: float, hostnames_only: bool = False):
     print(f"Querying ip information from {ips[0]} ... {ips[-1]}")
     success_list = []  # contains InternetDB instance
     failure_list = []  # contains ip address
-    cve_db = CVEDB()
     for ip in tqdm(ips):
         try:
             idb_info = query_idb(ip)
-            if idb_info and filter_cvss(idb_info, cve_db, cvss_threshold):
+            if idb_info and filter_cvss(idb_info, cvedb, cvss_threshold):
                 if hostnames_only:
                     success_list += idb_info.hostnames
                 else:
@@ -105,28 +108,24 @@ def start_scan(ips: list, cvss_threshold: float, hostnames_only: bool = False):
         except Exception as e:
             print(f"Exception: {e} while querying {ip}")
             failure_list.append(ip)
-    cve_db.close()
     return success_list, failure_list
 
 
-def start(targets: list, out_dest: str, db_enabled: bool, cvss_threshold: float, hostnames_only: bool = False, ipv6: bool = False):
+# def start(targets: list, out_dest: str, db_enabled: bool, cvss_threshold: float, hostnames_only: bool = False, ipv6: bool = False):
+def start(targets: list, out_dest: str, cvss_threshold: float, hostnames_only: bool = False, ipv6: bool = False):
     """
     entry point for InternetDBService
     """
-    db = Database(out_dest, model=InternetDB) if db_enabled else None
+    cvedb = db.init_db() if cvss_threshold else None  # only load or create CVEdb instance if cvss threashold is given
     to_scan_list = utils.split_list(list_to_ips(targets, ipv6))
     for i in range(len(to_scan_list)):
-        success_list, failure_list = start_scan(to_scan_list[i], cvss_threshold, hostnames_only)
-        if db:  # write to database
-            dao = InternetDBDAO(db)
-            for idb in success_list:  # type(idb) => InternetDB instance
-                idb.format_data_for_db()
-                dao.update_record(idb) if dao.has_record_for_ip(idb.ip) else dao.add_record(idb)
-            db.commit()
-        else:  # write to file or stdout
-            if len(success_list) != 0 or len(failure_list) != 0:
-                write_result(success_list, failure_list, out_dest, i)
-            else:
-                print(f"No available information from IP range from {to_scan_list[i][0]} ... {to_scan_list[i][-1]}")
-    if db:  # if database is created
-        db.close()
+        # s_list, f_list = start_scan(to_scan_list[i], cvss_threshold, hostnames_only)
+        s_list, f_list = start_scan(to_scan_list[i], cvedb, cvss_threshold, hostnames_only)
+        if len(s_list) != 0 or len(f_list) != 0:
+            write_result(s_list, f_list, out_dest, i)
+        else:
+            print(f"No available information from IP range from {to_scan_list[i][0]} ... {to_scan_list[i][-1]}")
+    if cvedb:
+        db.dump_db(cvedb)  # dump database, Metrics maybe created during process
+
+
