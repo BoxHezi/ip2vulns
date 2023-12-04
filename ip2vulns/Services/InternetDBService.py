@@ -39,10 +39,10 @@ def query_idb(ip):
 
 def filter_cvss(idb: InternetDB, cvedb: db.CVEdb, cvss_threshold: float) -> bool:
     """
-    Filters based on given CVSS score. If the CVSS score of a given CVE is higher than the CVSS threshold score, the function returns True.
+    Filters CVEs based on a given CVSS score. If the CVSS score of a given CVE is higher than the CVSS threshold score, the function returns True.
 
     :param idb: An instance of InternetDB.
-    :param cvedb: An instance of CVEDB.
+    :param cvedb: An instance of CVEdb.
     :param cvss_threshold: The CVSS score threshold.
     :return: True if the InternetDB instance contains a CVE which has a CVSS score greater than the CVSS threshold, False otherwise.
     """
@@ -85,11 +85,11 @@ def write_result(success_list: list, failure_list: list, out_dest: str, out_inde
             print(ip)
 
 
-# def start_scan(ips: list, cvss_threshold: float, hostnames_only: bool = False):
-def start_scan(ips: list, cvedb, cvss_threshold: float, hostnames_only: bool = False):
+def start_scan(ips: list, cvedb: db.CVEdb, cvss_threshold: float, hostnames_only: bool = False):
     """
     Scans a list of IP addresses and filters the results based on a given CVSS score threshold
     :param ips: A list of IP addresses to scan
+    :param cvedb: cvedb instance
     :param cvss_threshold: A list of IP addresses to scan
     :param hostnames_only: A flag indicating whether to return only hostnames. Defaults to False
     :return: a size 2 tuple, contains success_list and failure_list
@@ -111,7 +111,6 @@ def start_scan(ips: list, cvedb, cvss_threshold: float, hostnames_only: bool = F
     return success_list, failure_list
 
 
-# def start(targets: list, out_dest: str, db_enabled: bool, cvss_threshold: float, hostnames_only: bool = False, ipv6: bool = False):
 def start(targets: list, out_dest: str, cvss_threshold: float, hostnames_only: bool = False, ipv6: bool = False):
     """
     entry point for InternetDBService
@@ -119,7 +118,6 @@ def start(targets: list, out_dest: str, cvss_threshold: float, hostnames_only: b
     cvedb = db.init_db() if cvss_threshold else None  # only load or create CVEdb instance if cvss threashold is given
     to_scan_list = utils.split_list(list_to_ips(targets, ipv6))
     for i in range(len(to_scan_list)):
-        # s_list, f_list = start_scan(to_scan_list[i], cvss_threshold, hostnames_only)
         s_list, f_list = start_scan(to_scan_list[i], cvedb, cvss_threshold, hostnames_only)
         if len(s_list) != 0 or len(f_list) != 0:
             write_result(s_list, f_list, out_dest, i)
