@@ -39,23 +39,25 @@ def query_idb(ip):
 
 def filter_cvss(idb: InternetDB, cvedb: db.CVEdb, cvss_threshold: float) -> bool:
     """
-    Filters CVEs based on a given CVSS score. If the CVSS score of a given CVE is higher than the CVSS threshold score, the function returns True.
+    Filters CVEs based on a given CVSS score. If the CVSS score of a given CVE is higher than the CVSS threshold
+    score, the function returns True.
 
     :param idb: An instance of InternetDB.
     :param cvedb: An instance of CVEdb.
-    :param cvss_threshold: The CVSS score threshold.
-    :return: True if the InternetDB instance contains a CVE which has a CVSS score greater than the CVSS threshold, False otherwise.
+    :param cvss_threshold: The CVSS score threshold
+    :return: True if the InternetDB instance contains a CVE which has a CVSS score greater than the CVSS
+    threshold, False otherwise.
     """
     # if not cvss score is specified return True
     if not cvss_threshold:
         return True
 
     potential_target = False
-    for id in idb.vulns:
-        cve = cvedb.get_cve_by_id(id)
+    for cveid in idb.vulns:
+        cve = cvedb.get_cve_by_id(cveid)
         cvss = cve.get_cvss_score()
         if not cvss:
-            print(f"Creating Metrics for CVE: {id}")
+            print(f"Creating Metrics for CVE: {cveid}")
             cve.create_metrics(False)
             cvss = cve.get_cvss_score()
         if float(cvss) >= float(cvss_threshold):

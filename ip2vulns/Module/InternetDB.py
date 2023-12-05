@@ -1,7 +1,7 @@
 from .. import utils
 
 
-class InternetDB():
+class InternetDB:
     def __init__(self, data):
         self.ip = utils.ip_int(data["ip"])
         self.ip_str = data["ip"]

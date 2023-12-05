@@ -13,6 +13,9 @@ import re
 import nvdlib
 
 
+CIDR_PATTERN = r"\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\/\d{1,2}"
+
+
 def internet_db_query(ip: str, timeout: int = 50):
     api = "https://internetdb.shodan.io/"
     endpoint = api + ip
@@ -21,6 +24,7 @@ def internet_db_query(ip: str, timeout: int = 50):
 
 def resp_2_json(resp):
     return resp.json()
+
 
 ##############################
 # Datetime
@@ -38,7 +42,7 @@ def datetime_2_str(dt: datetime.datetime, replace_whitespace: bool = True) -> st
     """
     out = str(dt)
     if replace_whitespace:
-        out = out.replace(" ", "_")
+        out = out.replace(" ", "T")
     return out
 
 
@@ -51,7 +55,6 @@ def is_cidr(s: str):
     :param s: string to check
     :return: True if in cidr format, False otherwise
     """
-    CIDR_PATTERN = r"\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\/\d{1,2}"
     return re.match(CIDR_PATTERN, s)
 
 
@@ -135,7 +138,7 @@ def create_path(path: str):
     try:
         p = Path(path)
         p.mkdir(mode=0o744, parents=True, exist_ok=True)
-    except Exception as _:
+    except:
         print(f"Cannot make directory {path}")
 
 
@@ -195,6 +198,7 @@ def output_to_dest(success_list: list, dest: str, out_index: int):
     write data to given destination
     :param success_list: list of ip addresses contains information
     :param dest: destination to write to
+    :param out_index: output file index
     """
     # construct output file name
     output_dest = dest[:dest.rfind(".")] + f"_{out_index}" + dest[dest.rfind("."):] if dest else None
