@@ -1,7 +1,4 @@
-SQLAlchemy
 requests
 nvdlib
-ares
 tqdm
-setuptools
-tinydb
+py-cvedb
