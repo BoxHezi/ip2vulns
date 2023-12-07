@@ -20,7 +20,7 @@ setup(
         "requests",
         "nvdlib",
         "tqdm",
-        "py-cvedb"
+        "py-cvedb>=0.0.4-2"
     ],
     entry_points={
         'console_scripts': [

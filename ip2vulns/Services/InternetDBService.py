@@ -57,7 +57,7 @@ def filter_cvss(idb: InternetDB, cvedb: db.CVEdb, cvss_threshold: float) -> bool
         cve = cvedb.get_cve_by_id(cveid)
         cvss = cve.get_cvss_score()
         if not cvss:
-            print(f"Creating Metrics for CVE: {cveid}")
+            # print(f"Creating Metrics for CVE: {cveid}")
             cve.create_metrics(False)
             cvss = cve.get_cvss_score()
         if float(cvss) >= float(cvss_threshold):
