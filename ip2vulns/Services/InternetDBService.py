@@ -52,19 +52,22 @@ def filter_cvss(idb: InternetDB, cvedb: db.CVEdb, cvss_threshold: float) -> bool
     if not cvss_threshold:
         return True
 
-    potential_target = False
-    for cveid in idb.vulns:
-        cve = cvedb.get_cve_by_id(cveid)
+    # print(f"BEFORE FILTER LEN: {len(idb.vulns)}")
+    valid_vulns = []  # store CVEs which has CVSS score larger than the given one
+    for cve_id in tqdm(idb.vulns, leave=False, desc=f"Checking CVEs"):
+        cve = cvedb.get_cve_by_id(cve_id)
         cvss = cve.get_cvss_score()
         if not cvss:
             # print(f"Creating Metrics for CVE: {cveid}")
             cve.create_metrics(False)
             cvss = cve.get_cvss_score()
         if float(cvss) >= float(cvss_threshold):
-            potential_target = True
-            if float(cvss_threshold) != 0: # when 0 is given, loop through all CVEs
-                return True
-    return potential_target
+            valid_vulns.append(cve_id)
+    if valid_vulns:
+        idb.vulns = valid_vulns
+        # print(f"AFTER FILTER LEN: {len(idb.vulns)}")
+        return True
+    return False
 
 
 def write_result(success_list: list, failure_list: list, out_dest: str, out_index: int):
@@ -99,14 +102,15 @@ def start_scan(ips: list, cvedb: db.CVEdb, cvss_threshold: float, hostnames_only
     print(f"Querying ip information from {ips[0]} ... {ips[-1]}")
     success_list = []  # contains InternetDB instance
     failure_list = []  # contains ip address
-    for ip in tqdm(ips):
+    for ip in (pbar := tqdm(ips)):
+        pbar.set_description(f"Querying {ip}")
         try:
-            idb_info = query_idb(ip)
-            if idb_info and filter_cvss(idb_info, cvedb, cvss_threshold):
+            idb = query_idb(ip)
+            if idb and filter_cvss(idb, cvedb, cvss_threshold):
                 if hostnames_only:
-                    success_list += idb_info.hostnames
+                    success_list += idb.hostnames
                 else:
-                    success_list.append(idb_info)
+                    success_list.append(idb)
         except Exception as e:
             print(f"Exception: {e} while querying {ip}")
             failure_list.append(ip)

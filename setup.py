@@ -26,5 +26,6 @@ setup(
         'console_scripts': [
             'ip2vulns = ip2vulns.ip2vulns:main'
         ]
-    }
+    },
+    python_requires=">=3.8"
 )
