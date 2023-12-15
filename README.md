@@ -26,7 +26,7 @@ IP 2 vulneribility tools
 
 options:
   -h, --help            show this help message and exit
-  -i ip_or_cidr [ip_or_cidr ...], --internetdb ip_or_cidr [ip_or_cidr ...]
+  -i ip_or_cidr [ip_or_cidr ...], --input ip_or_cidr [ip_or_cidr ...]
                         Query information from https://internetdb.shodan.io/
                         support multiple ip and cidr, separate using space, e.g. -i 8.8.8.8 51.83.59.99 192.168.0.0/24
   -s CVSS, --cvss CVSS  Enable cvss score filter, required a number
