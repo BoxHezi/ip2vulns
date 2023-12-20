@@ -193,22 +193,24 @@ def smart_open(file_path: str = None):
             fd.close()
 
 
-def output_to_dest(success_list: list, dest: str, out_index: int):
+def output_to_dest(success_list: list, dest: str):
     """
     write data to given destination
     :param success_list: list of ip addresses contains information
     :param dest: destination to write to
-    :param out_index: output file index
     """
-    # construct output file name
-    output_dest = dest[:dest.rfind(".")] + f"_{out_index}" + dest[dest.rfind("."):] if dest else None
-
-    with smart_open(output_dest) as fd:  # fd: file descriptor
-        if dest is None or dest.endswith(".csv"):
+    # print(len(success_list))
+    if dest is None or dest.endswith("csv"):  # output to stdout or csv
+        with smart_open(dest) as fd:
             for item in success_list:
                 print(str(item), file=fd)
-        elif dest.endswith(".json"):
-            json.dump(jsonify_objs(success_list), fp=fd, indent=4, sort_keys=True)
+    elif dest.lower() == "json":  # output to json
+        prefix = "./out_json/"
+        create_path(prefix)
+        for item in success_list:
+            # print(item.ip_str)
+            with smart_open(f"{prefix + item.ip_str}.json") as fd:
+                json.dump(vars(item), fp=fd, indent=4, sort_keys=True, default=str)
 
 
 ##############################

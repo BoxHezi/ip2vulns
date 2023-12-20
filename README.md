@@ -20,7 +20,7 @@ Using the following pip command to install: `pip install ip2vulns`
 # Usage
 
 ```text
-usage: ip2vulns [-h] [-i INTERNETDB [INTERNETDB ...]] [-o OUT] [-s CVSS] [-d] [--downloaddb] [--ho] [-v]
+usage: ip2vulns [-h] [-i INTERNETDB [INTERNETDB ...]] [-s CVSS] [-o OUT] [--ho] [-v]
 
 IP 2 vulneribility tools
 
@@ -32,10 +32,11 @@ options:
                         if no database if specified, use ./databases/internetdb.db
   -s CVSS, --cvss CVSS  Enable cvss score filter, required a number
                         If 0 is given, targets found with no CVE information will be filtered out. And all CVEs will be checked.
-                        When 0 is given, the process can be slow if huge amount of CVEs are founded. Not Recommend.
+                        When 0 is given, the process can be slow if huge amount of CVEs are founded. Not Recommend to pass 0 in.
   -o OUT, --out OUT     Define output file, default print to stdout
                         Available option: stdout (default), csv, json
-                        Note: if -db flag is enabled, -out option will be disabled
+                        For csv: please specify filename
+                        For json: a directory out_json will be created
   --ho                  Output hostnames only for scan result.
                         This option DOES NOT apply to -d/--database option
   -v, --version         Print current version
@@ -49,14 +50,11 @@ The scan operation will be splitted into several groups. Each group contains max
 
 When no `-o/--out` option is provided, results are printed to stdout.
 
-When providing the `-o/--out` option, results will be written to files.
-Each group's result will be written to separated files. Group index (starting from 0) will be appened to file output filename.
+When output to csv file, please specify the filename.
+For example, `ip2vulns -i 1.1.1.1 -o 1.1.1.1.csv`, the output file will be `1.1.1.1.csv`.
 
-> If 512 IPs are going to be scanned. The results will be written to 2 files.
-> If `-o test.csv` is given, then output files will be:
->
-> - test_0.csv
-> - test_1.csv
+When output to json file, a directory `out_json` will be created. Results will be stored using `<ip>.json`.
+For example, `ip2vulns -i 1.1.1.1 -o json`, then a directory `out_json` will be created. And the output filename will be `1.1.1.1.json`.
 
 # Local CVE Database
 

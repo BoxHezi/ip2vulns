@@ -17,7 +17,8 @@ def init_argparse():
                                         "When 0 is given, the process can be slow if huge amount of CVEs are founded. Not Recommend to pass 0 in.")
     arg.add_argument("-o", "--out", help="Define output file, default print to stdout\n"
                                          "Available option: stdout (default), csv, json\n"
-                                         "Note: if -db flag is enabled, -out option will be disabled")
+                                         "For csv: please specify filename\n"
+                                         "For json: a directory out_json will be created")
     arg.add_argument("--ho", help="Output hostnames only for scan result.\n"
                      "This option DOES NOT apply to -d/--database option", action="store_true")
     arg.add_argument("-v", "--version", help="Print current version", action="store_true")

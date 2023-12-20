@@ -70,7 +70,7 @@ def filter_cvss(idb: InternetDB, cvedb: db.CVEdb, cvss_threshold: float) -> bool
     return False
 
 
-def write_result(success_list: list, failure_list: list, out_dest: str, out_index: int):
+def write_result(success_list: list, failure_list: list, out_option: str):
     """
     Writes the results of the IP scan to the specified output destination. If no destination is specified, results are written to stdout.
     :param success_list: A list of successful InternetDB instances.
@@ -78,12 +78,8 @@ def write_result(success_list: list, failure_list: list, out_dest: str, out_inde
     :param out_dest: The output destination. If not specified, output is written to stdout.
     :param out_index: The index of the output file.
     """
-    if out_dest:
-        out_path = out_dest[:out_dest.rfind("/") + 1] if out_dest.rfind("/") != -1 else "./"
-        utils.create_path(out_path)
-
     if len(success_list) != 0:
-        utils.output_to_dest(success_list, out_dest, out_index)  # writing to destination (stdout by default)
+        utils.output_to_dest(success_list, out_option)  # writing to destination (stdout by default)
     if len(failure_list) != 0:
         print("\nException happened during following IP addresses: ")
         for ip in failure_list:
@@ -117,7 +113,7 @@ def start_scan(ips: list, cvedb: db.CVEdb, cvss_threshold: float, hostnames_only
     return success_list, failure_list
 
 
-def start(targets: list, out_dest: str, cvss_threshold: float, hostnames_only: bool = False, ipv6: bool = False):
+def start(targets: list, out_option: str, cvss_threshold: float, hostnames_only: bool = False, ipv6: bool = False):
     """
     entry point for InternetDBService
     """
@@ -126,7 +122,7 @@ def start(targets: list, out_dest: str, cvss_threshold: float, hostnames_only: b
     for i in range(len(to_scan_list)):
         s_list, f_list = start_scan(to_scan_list[i], cvedb, cvss_threshold, hostnames_only)
         if len(s_list) != 0 or len(f_list) != 0:
-            write_result(s_list, f_list, out_dest, i)
+            write_result(s_list, f_list, out_option)
         else:
             print(f"No available information from IP range from {to_scan_list[i][0]} ... {to_scan_list[i][-1]}")
     if cvedb:
