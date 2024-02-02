@@ -6,6 +6,15 @@ with open("./README.md", "r") as file:
     for line in file:
         long_desc += line
 
+
+requires = [
+    "requests",
+    "nvdlib",
+    "tqdm",
+    "py-cvedb>=0.0.4-2"
+]
+
+
 setup(
     name="ip2vulns",
     version=__version__,
@@ -16,12 +25,7 @@ setup(
     long_description=long_desc,
     long_description_content_type="text/markdown",
     url="https://github.com/BoxHezi/ip2vulns",
-    install_requires=[
-        "requests",
-        "nvdlib",
-        "tqdm",
-        "py-cvedb>=0.0.4-2"
-    ],
+    install_requires=requires,
     entry_points={
         'console_scripts': [
             'ip2vulns = ip2vulns.ip2vulns:main'
