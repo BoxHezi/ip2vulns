@@ -6,3 +6,5 @@ databases/
 .fleet/
 .vscode/
 __pycache__/
+
+*.csv

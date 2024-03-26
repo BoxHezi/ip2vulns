@@ -101,7 +101,7 @@ def start_scan(ips: list, cvedb: db.CVEdb, cvss_threshold: float, hostnames_only
     for ip in (pbar := tqdm(ips)):
         pbar.set_description(f"Querying {ip}")
         try:
-            idb = query_idb(ip)
+            idb = query_idb(ip)  # return InternetDB instance if there is information available, None otherwise
             if idb and filter_cvss(idb, cvedb, cvss_threshold):
                 if hostnames_only:
                     success_list += idb.hostnames
@@ -113,19 +113,45 @@ def start_scan(ips: list, cvedb: db.CVEdb, cvss_threshold: float, hostnames_only
     return success_list, failure_list
 
 
-def start(targets: list, out_option: str, cvss_threshold: float, hostnames_only: bool = False, ipv6: bool = False):
-    """
-    entry point for InternetDBService
-    """
-    cvedb = db.init_db() if cvss_threshold else None  # only load or create CVEdb instance if cvss threashold is given
+# def start(targets: list, out_option: str, cvss_threshold: float, hostnames_only: bool = False, ipv6: bool = False):
+#     """
+#     entry point for InternetDBService
+#     """
+#     cvedb = db.init_db() if cvss_threshold else None  # only load or create CVEdb instance if cvss threashold is given
+#     to_scan_list = utils.split_list(list_to_ips(targets, ipv6))
+#     for i in range(len(to_scan_list)):
+#         s_list, f_list = start_scan(to_scan_list[i], cvedb, cvss_threshold, hostnames_only)
+#         if len(s_list) != 0 or len(f_list) != 0:
+#             write_result(s_list, f_list, out_option)
+#         else:
+#             print(f"No available information from IP range from {to_scan_list[i][0]} ... {to_scan_list[i][-1]}")
+#     if cvedb:
+#         db.dump_db(cvedb)  # dump database, Metrics maybe created during process
+
+
+def start(targets: list, out_option: str, cvss_threadhold: float, hostnames_only: bool = False, ipv6: bool = False):
+    full_s_list = []  # store InternetDB instance for all ips has available information from internet.shodan.io
+    full_f_list = []  # store ip addresses while exception happened during query from internet.shodan.io
     to_scan_list = utils.split_list(list_to_ips(targets, ipv6))
     for i in range(len(to_scan_list)):
-        s_list, f_list = start_scan(to_scan_list[i], cvedb, cvss_threshold, hostnames_only)
-        if len(s_list) != 0 or len(f_list) != 0:
-            write_result(s_list, f_list, out_option)
-        else:
-            print(f"No available information from IP range from {to_scan_list[i][0]} ... {to_scan_list[i][-1]}")
-    if cvedb:
-        db.dump_db(cvedb)  # dump database, Metrics maybe created during process
+        s_list, f_list = start_scan(to_scan_list[i], cvss_threadhold, hostnames_only)
+        full_s_list += s_list
+        full_f_list += f_list
+    print(f"Length of full_s_list: {len(full_s_list)}")
+    print(f"Length of full_f_list: {len(full_f_list)}")
+    if len(full_s_list) != 0 or len(full_f_list) != 0:
+        write_result(full_s_list, full_f_list, out_option)
+    # target_list = utils.split_list(list_to_ips(targets, ipv6))
+    # print(len(target_list))
+    # target_list = utils.split_list(list_to_ips(targets, ipv6))
+    # for i in range(len(target_list)):
+    #     s_list, f_list = start_scan(target_list[i], cvss_threadhold, hostnames_only)
+    #     full_s_list += s_list
+    #     full_f_list += f_list
+    # # write results to file
+    # if len(full_s_list) != 0 or len(full_f_list) != 0:
+    #     write_result(full_s_list, full_f_list, out_option)
+    # else:
+    #     print(f"No available information from IP range from {target_list[0]} ... {target_list[-1]}")
 
 
