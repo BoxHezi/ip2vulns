@@ -3,9 +3,15 @@ from tqdm import tqdm
 from ..Module.InternetDB import InternetDB
 from .. import utils
 
-from cvedb import cvedb as db
+from . import CveService
+
+# from cvedb import cvedb as db
 
 # ref: https://internetdb.shodan.io/
+
+# local CVE cache to avoid searching duplicate CVEs
+# structure { "CVE-YYYY-XXXX" : <score> }
+CVE_CACHE = {}
 
 
 def list_to_ips(ls, ipv6: bool = False) -> list:
@@ -37,7 +43,7 @@ def query_idb(ip):
     return InternetDB(resp_json)
 
 
-def filter_cvss(idb: InternetDB, cvedb: db.CVEdb, cvss_threshold: float) -> bool:
+def filter_cvss(idb: InternetDB, cvss_threshold: float) -> bool:
     """
     Filters CVEs based on a given CVSS score. If the CVSS score of a given CVE is higher than the CVSS threshold
     score, the function returns True.
@@ -52,22 +58,31 @@ def filter_cvss(idb: InternetDB, cvedb: db.CVEdb, cvss_threshold: float) -> bool
     if not cvss_threshold:
         return True
 
+    # print(repr(idb))
+    for cve in (pbar := tqdm(idb.vulns, leave=False)):
+        pbar.set_description(f"Checking {cve}")
+        # TODO: maybe using https://github.com/fkie-cad/nvd-json-data-feeds/tree/main
+        print()
+        endpoint = CveService.construct_url(cve)
+        print(endpoint)
+    # for cve in tqdm(idb.vulns, leave=False):
+    #     print(cve)
     # print(f"BEFORE FILTER LEN: {len(idb.vulns)}")
-    valid_vulns = []  # store CVEs which has CVSS score larger than the given one
-    for cve_id in tqdm(idb.vulns, leave=False, desc=f"Checking CVEs"):
-        cve = cvedb.get_cve_by_id(cve_id)
-        cvss = cve.get_cvss_score()
-        if not cvss:
-            # print(f"Creating Metrics for CVE: {cveid}")
-            cve.create_metrics(False)
-            cvss = cve.get_cvss_score()
-        if float(cvss) >= float(cvss_threshold):
-            valid_vulns.append(cve_id)
-    if valid_vulns:
-        idb.vulns = valid_vulns
-        # print(f"AFTER FILTER LEN: {len(idb.vulns)}")
-        return True
-    return False
+    # valid_vulns = []  # store CVEs which has CVSS score larger than the given one
+    # for cve_id in tqdm(idb.vulns, leave=False, desc=f"Checking CVEs"):
+    #     cve = cvedb.get_cve_by_id(cve_id)
+    #     cvss = cve.get_cvss_score()
+    #     if not cvss:
+    #         # print(f"Creating Metrics for CVE: {cveid}")
+    #         cve.create_metrics(False)
+    #         cvss = cve.get_cvss_score()
+    #     if float(cvss) >= float(cvss_threshold):
+    #         valid_vulns.append(cve_id)
+    # if valid_vulns:
+    #     idb.vulns = valid_vulns
+    #     # print(f"AFTER FILTER LEN: {len(idb.vulns)}")
+    #     return True
+    # return False
 
 
 def write_result(success_list: list, failure_list: list, out_option: str):
@@ -86,7 +101,7 @@ def write_result(success_list: list, failure_list: list, out_option: str):
             print(ip)
 
 
-def start_scan(ips: list, cvedb: db.CVEdb, cvss_threshold: float, hostnames_only: bool = False):
+def start_scan(ips: list, cvss_threshold: float, hostnames_only: bool = False):
     """
     Scans a list of IP addresses and filters the results based on a given CVSS score threshold
     :param ips: A list of IP addresses to scan
@@ -102,7 +117,7 @@ def start_scan(ips: list, cvedb: db.CVEdb, cvss_threshold: float, hostnames_only
         pbar.set_description(f"Querying {ip}")
         try:
             idb = query_idb(ip)  # return InternetDB instance if there is information available, None otherwise
-            if idb and filter_cvss(idb, cvedb, cvss_threshold):
+            if idb and filter_cvss(idb, cvss_threshold):
                 if hostnames_only:
                     success_list += idb.hostnames
                 else:
@@ -113,28 +128,12 @@ def start_scan(ips: list, cvedb: db.CVEdb, cvss_threshold: float, hostnames_only
     return success_list, failure_list
 
 
-# def start(targets: list, out_option: str, cvss_threshold: float, hostnames_only: bool = False, ipv6: bool = False):
-#     """
-#     entry point for InternetDBService
-#     """
-#     cvedb = db.init_db() if cvss_threshold else None  # only load or create CVEdb instance if cvss threashold is given
-#     to_scan_list = utils.split_list(list_to_ips(targets, ipv6))
-#     for i in range(len(to_scan_list)):
-#         s_list, f_list = start_scan(to_scan_list[i], cvedb, cvss_threshold, hostnames_only)
-#         if len(s_list) != 0 or len(f_list) != 0:
-#             write_result(s_list, f_list, out_option)
-#         else:
-#             print(f"No available information from IP range from {to_scan_list[i][0]} ... {to_scan_list[i][-1]}")
-#     if cvedb:
-#         db.dump_db(cvedb)  # dump database, Metrics maybe created during process
-
-
-def start(targets: list, out_option: str, cvss_threadhold: float, hostnames_only: bool = False, ipv6: bool = False):
+def start(targets: list, out_option: str, cvss_threshold: float, hostnames_only: bool = False, ipv6: bool = False):
     full_s_list = []  # store InternetDB instance for all ips has available information from internet.shodan.io
     full_f_list = []  # store ip addresses while exception happened during query from internet.shodan.io
     to_scan_list = utils.split_list(list_to_ips(targets, ipv6))
     for i in range(len(to_scan_list)):
-        s_list, f_list = start_scan(to_scan_list[i], cvss_threadhold, hostnames_only)
+        s_list, f_list = start_scan(to_scan_list[i], cvss_threshold, hostnames_only)
         full_s_list += s_list
         full_f_list += f_list
     print(f"Length of full_s_list: {len(full_s_list)}")

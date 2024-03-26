@@ -11,7 +11,7 @@ requires = [
     "requests",
     "nvdlib",
     "tqdm",
-    "py-cvedb>=0.0.4-2"
+    # "py-cvedb>=0.0.4-2"
 ]
 
 
