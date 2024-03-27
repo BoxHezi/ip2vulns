@@ -6,8 +6,6 @@ from .. import utils
 
 from . import CveService
 
-# from cvedb import cvedb as db
-
 # ref: https://internetdb.shodan.io/
 
 # local CVE cache to avoid searching duplicate CVEs
@@ -41,7 +39,7 @@ def query_idb(ip):
     resp_json = utils.resp_2_json(resp)
     if "ip" not in resp_json:
         return None
-    return InternetDB(resp_json)
+    return InternetDB(**resp_json)
 
 
 def filter_cvss(idb: InternetDB, cvss_threshold: float) -> bool:
@@ -118,29 +116,15 @@ def start_scan(ips: list, cvss_threshold: float, hostnames_only: bool = False):
 
 def start(targets: list, out_option: str, cvss_threshold: float, hostnames_only: bool = False, ipv6: bool = False):
     full_s_list = []  # store InternetDB instance for all ips has available information from internet.shodan.io
-    full_f_list = []  # store ip addresses while exception happened during query from internet.shodan.io
+    full_f_list = []  # store ip addresses while exception happened during any stage of the scan progress
     to_scan_list = utils.split_list(list_to_ips(targets, ipv6))
     for i in range(len(to_scan_list)):
         s_list, f_list = start_scan(to_scan_list[i], cvss_threshold, hostnames_only)
         full_s_list += s_list
         full_f_list += f_list
-    # print(f"Length of full_s_list: {len(full_s_list)}")
-    # print(f"Length of full_f_list: {len(full_f_list)}")
     if len(full_s_list) != 0 or len(full_f_list) != 0:
         write_result(full_s_list, full_f_list, out_option)
     else:
         print(f"No available information from IP range from {to_scan_list[0][0]} ... {to_scan_list[-1][-1]}")
-    # target_list = utils.split_list(list_to_ips(targets, ipv6))
-    # print(len(target_list))
-    # target_list = utils.split_list(list_to_ips(targets, ipv6))
-    # for i in range(len(target_list)):
-    #     s_list, f_list = start_scan(target_list[i], cvss_threadhold, hostnames_only)
-    #     full_s_list += s_list
-    #     full_f_list += f_list
-    # # write results to file
-    # if len(full_s_list) != 0 or len(full_f_list) != 0:
-    #     write_result(full_s_list, full_f_list, out_option)
-    # else:
-    #     print(f"No available information from IP range from {target_list[0]} ... {target_list[-1]}")
 
 

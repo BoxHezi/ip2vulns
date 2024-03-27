@@ -9,9 +9,7 @@ with open("./README.md", "r") as file:
 
 requires = [
     "requests",
-    "nvdlib",
-    "tqdm",
-    # "py-cvedb>=0.0.4-2"
+    "tqdm"
 ]
 
 

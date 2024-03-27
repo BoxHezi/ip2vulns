@@ -9,7 +9,6 @@ class CVE:
         return vars(self).get("id")
 
     def get_cvss_score(self):
-        # print(vars(self).get("metrics"))
         version = ""
         score = 0
         severity = "None"

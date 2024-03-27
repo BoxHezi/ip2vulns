@@ -12,21 +12,16 @@ END_POINT_PREFIX = "https://raw.githubusercontent.com/fkie-cad/nvd-json-data-fee
 
 
 def construct_url(cve_id):
-    return END_POINT_PREFIX + construct_suffix(cve_id)
-
-
-def construct_suffix(cve_id):
     year = cve_id[0:8]
     branch = cve_id[:-2] + "xx"
     ending = cve_id + ".json"
 
-    return year + "/" + branch + "/" + ending
+    return END_POINT_PREFIX + year + "/" + branch + "/" + ending
 
 
-# TODO: query CVE information from contructed URL
 def get_cve_info(cve_id: str) -> CVE:
     url = construct_url(cve_id)
-    # print(url)
+    # print("\n" + url)
     try:
         resp = requests.get(url)
         resp_json = utils.resp_2_json(resp)
