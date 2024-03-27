@@ -1,3 +1,8 @@
+import requests
+
+from .. import utils
+from ..Module.CVE import CVE
+
 # Get CVE Info from: https://github.com/fkie-cad/nvd-json-data-feeds/tree/main
 
 # get raw content: https://raw.githubusercontent.com/fkie-cad/nvd-json-data-feeds/main/<CVE years>/<CVE-id-prefix>/<CVE-id>.json
@@ -17,9 +22,17 @@ def construct_suffix(cve_id):
 
     return year + "/" + branch + "/" + ending
 
-# NVD_KEY = os.getenv("NVD_KEY")
 
+# TODO: query CVE information from contructed URL
+def get_cve_info(cve_id: str) -> CVE:
+    url = construct_url(cve_id)
+    # print(url)
+    try:
+        resp = requests.get(url)
+        resp_json = utils.resp_2_json(resp)
+    except Exception:
+        print(f"Exception while querying CVE {cve_id}")
 
-# def get_cve_by_id(cve_id: str, key: str = NVD_KEY):
-#     return nvdlib.searchCVE(cveId=cve_id, key=key)[0]
+    temp = CVE(**resp_json)
+    return temp
 

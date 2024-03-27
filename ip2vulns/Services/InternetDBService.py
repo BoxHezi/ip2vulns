@@ -1,6 +1,7 @@
 from tqdm import tqdm
 
 from ..Module.InternetDB import InternetDB
+from ..Module.CVE import CVE
 from .. import utils
 
 from . import CveService
@@ -10,8 +11,8 @@ from . import CveService
 # ref: https://internetdb.shodan.io/
 
 # local CVE cache to avoid searching duplicate CVEs
-# structure { "CVE-YYYY-XXXX" : <score> }
-CVE_CACHE = {}
+# structure { "CVE-YYYY-XXXX" : CVE instance }
+CVE_CACHE: dict[str, CVE] = {}
 
 
 def list_to_ips(ls, ipv6: bool = False) -> list:
@@ -45,11 +46,9 @@ def query_idb(ip):
 
 def filter_cvss(idb: InternetDB, cvss_threshold: float) -> bool:
     """
-    Filters CVEs based on a given CVSS score. If the CVSS score of a given CVE is higher than the CVSS threshold
-    score, the function returns True.
+    Filters CVEs based on a given CVSS score. If the CVSS score of a given CVE is higher than the CVSS threshold score, the function returns True.
 
     :param idb: An instance of InternetDB.
-    :param cvedb: An instance of CVEdb.
     :param cvss_threshold: The CVSS score threshold
     :return: True if the InternetDB instance contains a CVE which has a CVSS score greater than the CVSS
     threshold, False otherwise.
@@ -59,30 +58,19 @@ def filter_cvss(idb: InternetDB, cvss_threshold: float) -> bool:
         return True
 
     # print(repr(idb))
-    for cve in (pbar := tqdm(idb.vulns, leave=False)):
-        pbar.set_description(f"Checking {cve}")
-        # TODO: maybe using https://github.com/fkie-cad/nvd-json-data-feeds/tree/main
-        print()
-        endpoint = CveService.construct_url(cve)
-        print(endpoint)
-    # for cve in tqdm(idb.vulns, leave=False):
-    #     print(cve)
-    # print(f"BEFORE FILTER LEN: {len(idb.vulns)}")
-    # valid_vulns = []  # store CVEs which has CVSS score larger than the given one
-    # for cve_id in tqdm(idb.vulns, leave=False, desc=f"Checking CVEs"):
-    #     cve = cvedb.get_cve_by_id(cve_id)
-    #     cvss = cve.get_cvss_score()
-    #     if not cvss:
-    #         # print(f"Creating Metrics for CVE: {cveid}")
-    #         cve.create_metrics(False)
-    #         cvss = cve.get_cvss_score()
-    #     if float(cvss) >= float(cvss_threshold):
-    #         valid_vulns.append(cve_id)
-    # if valid_vulns:
-    #     idb.vulns = valid_vulns
-    #     # print(f"AFTER FILTER LEN: {len(idb.vulns)}")
-    #     return True
-    # return False
+    for cve_id in (pbar := tqdm(idb.vulns, leave=False)):
+        # type(cve) string, cve: CVE-YYYY-XXXX
+        pbar.set_description(f"Checking {cve_id}")
+        if cve_id in CVE_CACHE:
+            cve = CVE_CACHE.get(cve_id)
+        else:
+            cve = CveService.get_cve_info(cve_id)
+            CVE_CACHE.update({cve.get_id(): cve})
+
+        cvss = cve.get_cvss_score()[1]
+        if float(cvss) > float(cvss_threshold):
+            return True
+    return False
 
 
 def write_result(success_list: list, failure_list: list, out_option: str):
@@ -136,10 +124,12 @@ def start(targets: list, out_option: str, cvss_threshold: float, hostnames_only:
         s_list, f_list = start_scan(to_scan_list[i], cvss_threshold, hostnames_only)
         full_s_list += s_list
         full_f_list += f_list
-    print(f"Length of full_s_list: {len(full_s_list)}")
-    print(f"Length of full_f_list: {len(full_f_list)}")
+    # print(f"Length of full_s_list: {len(full_s_list)}")
+    # print(f"Length of full_f_list: {len(full_f_list)}")
     if len(full_s_list) != 0 or len(full_f_list) != 0:
         write_result(full_s_list, full_f_list, out_option)
+    else:
+        print(f"No available information from IP range from {to_scan_list[0][0]} ... {to_scan_list[-1][-1]}")
     # target_list = utils.split_list(list_to_ips(targets, ipv6))
     # print(len(target_list))
     # target_list = utils.split_list(list_to_ips(targets, ipv6))
