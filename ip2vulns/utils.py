@@ -2,7 +2,6 @@ import os
 import sys
 import contextlib
 from pathlib import Path
-from typing import Optional
 
 import datetime
 import requests
@@ -10,7 +9,6 @@ import requests
 import ipaddress
 import json
 import re
-import nvdlib
 
 
 CIDR_PATTERN = r"\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\/\d{1,2}"
@@ -111,27 +109,6 @@ def split_list(ls: list, size: int = 256) -> list[list]:
 
 
 ##############################
-# NIST NVD api
-##############################
-def get_nvd_key():
-    """
-    get NVD_KEY from environment varialbe
-    :return: NVD_KEY if key exists, None otherwise
-    """
-    key = os.getenv("NVD_KEY")
-    return key if key != "" else None
-
-
-def nvd_delay(key) -> Optional[int]:
-    """
-    get NIST NVD API dalay, if NVD KEY is present, set delay to 2 seconds
-    :param key: NVD KEY
-    :return: delay duration
-    """
-    return 1 if key else None
-
-
-##############################
 # Create path
 ##############################
 def create_path(path: str):
@@ -208,38 +185,6 @@ def output_to_dest(success_list: list, dest: str):
         prefix = "./out_json/"
         create_path(prefix)
         for item in success_list:
-            # print(item.ip_str)
-            with smart_open(f"{prefix + item.ip_str}.json") as fd:
+            with smart_open(f"{prefix + item.ip}.json") as fd:
                 json.dump(vars(item), fp=fd, indent=4, sort_keys=True, default=str)
 
-
-##############################
-# Convert single object to jsonify-able dictionary
-##############################
-def object_2_json(obj) -> dict:
-    """
-    convert obj into json/python dict format
-    :param obj: object to be processed
-    :return: dict formatted variable
-    """
-    out = {}
-    if isinstance(obj, dict):  # dict can be convert to json directly
-        return obj
-    entry = {}
-    try:
-        entry = vars(obj)
-    except:
-        return obj
-
-    for k, v in entry.items():
-        if isinstance(v, list):
-            value = []
-            for item in v:
-                value.append(object_2_json(item))
-            out.update({k: value})
-        elif isinstance(v, nvdlib.classes.CVE):
-            value = object_2_json(v)
-            out.update({k: value})
-        else:
-            out.update({k: v})
-    return out
