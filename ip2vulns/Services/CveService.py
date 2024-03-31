@@ -20,14 +20,13 @@ def construct_url(cve_id):
 
 
 def get_cve_info(cve_id: str) -> CVE:
-    url = construct_url(cve_id)
-    # print("\n" + url)
+    cve_data_endpoint = construct_url(cve_id)
+    # print("\n" + cve_endpoint)
     try:
-        resp = requests.get(url)
+        resp = requests.get(cve_data_endpoint)
         resp_json = utils.resp_2_json(resp)
-    except Exception:
+        return CVE(**resp_json)
+    except:
         print(f"Exception while querying CVE {cve_id}")
-
-    temp = CVE(**resp_json)
-    return temp
+        return None
 

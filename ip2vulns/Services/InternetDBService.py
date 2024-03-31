@@ -13,20 +13,20 @@ from . import CveService
 CVE_CACHE: dict[str, CVE] = {}
 
 
-def list_to_ips(ls, ipv6: bool = False) -> list:
+def list_to_ips(ls: list, ipv6: bool = False) -> list:
     """
     convert input list (either IPs or cidr, or both) to list of ip
     :param ls: list to convert
     :param ipv6: use IPv6 if True. Default set to False
     :return: a list contains IP addresses
     """
-    output = []
+    temp = []
     for i in ls:
         if utils.is_cidr(i):
-            output += utils.cidr2ip(i, ipv6)
+            temp += utils.cidr2ip(i, ipv6)
         else:
-            output.append(i)
-    return output
+            temp.append(i)
+    return list(dict.fromkeys(temp))  # deduplicate
 
 
 def query_idb(ip):
@@ -35,7 +35,7 @@ def query_idb(ip):
     :param ip: target ip address
     :return: InternetDB instance
     """
-    resp = utils.internet_db_query(ip, 50)  # type(result) => resp
+    resp = utils.internet_db_query(ip, 50)
     resp_json = utils.resp_2_json(resp)
     if "ip" not in resp_json:
         return None
@@ -63,7 +63,7 @@ def filter_cvss(idb: InternetDB, cvss_threshold: float) -> bool:
             cve = CVE_CACHE.get(cve_id)
         else:
             cve = CveService.get_cve_info(cve_id)
-            CVE_CACHE.update({cve.get_id(): cve})
+            cve and CVE_CACHE.update({cve.get_id(): cve})
 
         cvss = cve.get_cvss_score()[1]
         if float(cvss) > float(cvss_threshold):
