@@ -9,11 +9,14 @@ class InternetDB:
         self.last_updated = utils.get_now_datetime()
 
     def __repr__(self):
-        out = f"IP: {self.ip_str}\n"
-        out += f"Hostnames: {self.hostnames}\n"
-        out += f"Ports: {self.ports}\n"
-        out += f"vulns: {self.vulns}\n"
-        return out
+        out = [f"\nIP: {self.ip}"]
+        if self.hostnames:
+            out.extend(["\nHostnames:", *(f"\t{name}" for name in self.hostnames)])
+        if self.ports:
+            out.extend(["\nPorts:", *(f"\t{port}" for port in self.ports)])
+        if self.vulns:
+            out.extend(["\nVulns:", *(f"\t{vuln}" for vuln in self.vulns)])
+        return '\n'.join(out) + "\n"
 
     def __str__(self):
         # re-order keys of attribute
@@ -29,11 +32,11 @@ class InternetDB:
                 out.append(str(v))
         return ",".join(out)
 
-    def format_data_for_db(self):
-        self.hostnames = utils.list_2_str(self.hostnames)
-        self.ports = utils.list_2_str(self.ports)
-        self.cpes = utils.list_2_str(self.cpes)
-        self.vulns = utils.list_2_str(self.vulns)
-        self.tags = utils.list_2_str(self.tags)
+    # def format_data_for_db(self):
+    #     self.hostnames = utils.list_2_str(self.hostnames)
+    #     self.ports = utils.list_2_str(self.ports)
+    #     self.cpes = utils.list_2_str(self.cpes)
+    #     self.vulns = utils.list_2_str(self.vulns)
+    #     self.tags = utils.list_2_str(self.tags)
 
 
