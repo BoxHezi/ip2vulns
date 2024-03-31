@@ -1,4 +1,5 @@
 from tqdm import tqdm
+from typing import Optional
 
 from ..Module.InternetDB import InternetDB
 from ..Module.CVE import CVE
@@ -29,11 +30,11 @@ def list_to_ips(ls: list, ipv6: bool = False) -> list:
     return list(dict.fromkeys(temp))  # deduplicate
 
 
-def query_idb(ip):
+def query_idb(ip: str) -> Optional[InternetDB]:
     """
     query internetdb api for ip
     :param ip: target ip address
-    :return: InternetDB instance
+    :return: InternetDB instance, None if no information is available
     """
     resp = utils.internet_db_query(ip, 50)
     resp_json = utils.resp_2_json(resp)
@@ -57,7 +58,7 @@ def filter_cvss(idb: InternetDB, cvss_threshold: float) -> bool:
 
     # print(repr(idb))
     for cve_id in (pbar := tqdm(idb.vulns, leave=False)):
-        # type(cve) string, cve: CVE-YYYY-XXXX
+        # type(cve_id) => string, cve_id: CVE-YYYY-XXXX
         pbar.set_description(f"Checking {cve_id}")
         cve = CVE_CACHE.get(cve_id, None)
         if not cve:
@@ -85,13 +86,12 @@ def write_result(success_list: list, failure_list: list, out_option: str):
             print(ip)
 
 
-def start_scan(ips: list, cvss_threshold: float, hostnames_only: bool = False):
+def start_scan(ips: list, cvss_threshold: float) -> tuple[list, list]:
     """
     Scans a list of IP addresses and filters the results based on a given CVSS score threshold
     :param ips: A list of IP addresses to scan
     :param cvedb: cvedb instance
     :param cvss_threshold: A list of IP addresses to scan
-    :param hostnames_only: A flag indicating whether to return only hostnames. Defaults to False
     :return: a size 2 tuple, contains success_list and failure_list
     """
     print(f"Querying ip information from {ips[0]} ... {ips[-1]}")
@@ -102,22 +102,19 @@ def start_scan(ips: list, cvss_threshold: float, hostnames_only: bool = False):
         try:
             idb = query_idb(ip)  # return InternetDB instance if there is information available, None otherwise
             if idb and filter_cvss(idb, cvss_threshold):
-                if hostnames_only:
-                    success_list += idb.hostnames
-                else:
-                    success_list.append(idb)
+                success_list.append(idb)
         except Exception as e:
             print(f"Exception: {e} while querying {ip}")
             failure_list.append(ip)
     return success_list, failure_list
 
 
-def start(targets: list, out_option: str, cvss_threshold: float, hostnames_only: bool = False, ipv6: bool = False):
+def start(targets: list, out_option: str, cvss_threshold: float, ipv6: bool = False):
     full_s_list = []  # store InternetDB instance for all ips has available information from internet.shodan.io
     full_f_list = []  # store ip addresses while exception happened during any stage of the scan progress
     to_scan_list = utils.split_list(list_to_ips(targets, ipv6))
     for i in range(len(to_scan_list)):
-        s_list, f_list = start_scan(to_scan_list[i], cvss_threshold, hostnames_only)
+        s_list, f_list = start_scan(to_scan_list[i], cvss_threshold)
         full_s_list += s_list
         full_f_list += f_list
     if len(full_s_list) != 0 or len(full_f_list) != 0:

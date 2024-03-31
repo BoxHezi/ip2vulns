@@ -18,8 +18,6 @@ def init_argparse():
                                          "Available option: stdout (default), csv, json\n"
                                          "For csv: please specify filename\n"
                                          "For json: a directory out_json will be created")
-    arg.add_argument("--ho", help="Output hostnames only for scan result.\n"
-                     "This option DOES NOT apply to -d/--database option", action="store_true")
     arg.add_argument("-v", "--version", help="Print current version", action="store_true")
     return arg
 
@@ -30,8 +28,7 @@ def main():
         args.input = utils.read_from_pipe()
 
     if args.input:  # type(input) => list
-        # InternetDBService.start(args.input, args.out, args.database, args.cvss, args.ho)
-        InternetDBService.start(args.input, args.out, args.cvss, args.ho)
+        InternetDBService.start(args.input, args.out, args.cvss)
 
     if args.version:
         print(version.__version__)

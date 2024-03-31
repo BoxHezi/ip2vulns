@@ -14,12 +14,14 @@ For CVE information, this tool retrieve CVE information from a github repo [nvd-
 
 # Installation
 
+## Install with `pip`
+
 Using the following pip command to install: `pip install ip2vulns`
 
 # Usage
 
 ```text
-usage: ip2vulns [-h] [-i ip_or_cidr [ip_or_cidr ...]] [-o OUT] [-s CVSS] [-d] [--downloaddb] [--ho] [-v]
+usage: ip2vulns [-h] [-i ip_or_cidr [ip_or_cidr ...]] [-o OUT] [-s CVSS] [-v]
 
 IP 2 vulneribility tools
 
@@ -35,8 +37,6 @@ options:
                         Available option: stdout (default), csv, json
                         For csv: please specify filename
                         For json: a directory out_json will be created
-  --ho                  Output hostnames only for scan result.
-                        This option DOES NOT apply to -d/--database option
   -v, --version         Print current version
 ```
 

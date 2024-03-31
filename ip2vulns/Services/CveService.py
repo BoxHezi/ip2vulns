@@ -1,5 +1,7 @@
 import requests
 
+from typing import Optional
+
 from .. import utils
 from ..Module.CVE import CVE
 
@@ -19,9 +21,8 @@ def construct_url(cve_id):
     return END_POINT_PREFIX + year + "/" + branch + "/" + ending
 
 
-def get_cve_info(cve_id: str) -> CVE:
+def get_cve_info(cve_id: str) -> Optional[CVE]:
     cve_data_endpoint = construct_url(cve_id)
-    # print("\n" + cve_endpoint)
     try:
         resp = requests.get(cve_data_endpoint)
         resp_json = utils.resp_2_json(resp)
