@@ -59,14 +59,13 @@ def filter_cvss(idb: InternetDB, cvss_threshold: float) -> bool:
     for cve_id in (pbar := tqdm(idb.vulns, leave=False)):
         # type(cve) string, cve: CVE-YYYY-XXXX
         pbar.set_description(f"Checking {cve_id}")
-        if cve_id in CVE_CACHE:
-            cve = CVE_CACHE.get(cve_id)
-        else:
+        cve = CVE_CACHE.get(cve_id, None)
+        if not cve:
             cve = CveService.get_cve_info(cve_id)
-            cve and CVE_CACHE.update({cve.get_id(): cve})
+            CVE_CACHE.update({cve.get_id(): cve})
 
-        cvss = cve.get_cvss_score()[1]
-        if float(cvss) > float(cvss_threshold):
+        cvss = cve.get_cvss_score()
+        if float(cvss[1]) > float(cvss_threshold):
             return True
     return False
 
@@ -76,8 +75,7 @@ def write_result(success_list: list, failure_list: list, out_option: str):
     Writes the results of the IP scan to the specified output destination. If no destination is specified, results are written to stdout.
     :param success_list: A list of successful InternetDB instances.
     :param failure_list: A list of IP addresses where exceptions occurred during querying from the Shodan InternetDB API.
-    :param out_dest: The output destination. If not specified, output is written to stdout.
-    :param out_index: The index of the output file.
+    :param out_option: The output option, which can be 'stdout' (default), 'csv', or 'json'.
     """
     if len(success_list) != 0:
         utils.output_to_dest(success_list, out_option)  # writing to destination (stdout by default)
@@ -126,5 +124,17 @@ def start(targets: list, out_option: str, cvss_threshold: float, hostnames_only:
         write_result(full_s_list, full_f_list, out_option)
     else:
         print(f"No available information from IP range from {to_scan_list[0][0]} ... {to_scan_list[-1][-1]}")
+
+
+    # TODO: (maybe) deduplicate all CVEs and process filter_cvss after dedup
+    # cve_set = set()
+    # count = 0
+    # for idb in full_s_list:
+    #     cve_set |= set(idb.vulns)
+    #     count += len(idb.vulns)
+
+    # print(len(cve_set))
+    # print(count)
+
 
 
