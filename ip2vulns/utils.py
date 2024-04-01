@@ -61,7 +61,7 @@ def cidr2ip(cidr: str, t6: bool = False) -> list:
     convert cidr to ip list
     :param cidr: cidr representation
     :param t6: True if convert target is ipv6 address
-    :return: list of ipaddress
+    :return: list of ip address
     """
     if not t6:
         return [str(ip) for ip in ipaddress.IPv4Network(cidr)]
@@ -89,21 +89,12 @@ def ip_str(ip: int) -> str:
 ##############################
 # List related
 ##############################
-def list_2_str(ls: list, delimiter: str = ",") -> str:
-    """
-    turn list to string, separate by delimiter, default using comma
-    :param ls: list to be processed
-    :param delimiter: delimiter to be used to separate list item
-    """
-    return '' if len(ls) == 0 else delimiter.join(str(i) for i in ls)
-
-
 def split_list(ls: list, size: int = 256) -> list[list]:
     """
     split list into a fixed size of chunks
     :param ls: list to be processed
     :param size: size to be splited into
-    :return: a list of ip_list, each ip_list contains maximum size of IP addresses
+    :return: a list of ip_list
     """
     return [ls[i: i + size] for i in range(0, len(ls), size)]
 
@@ -128,26 +119,6 @@ def has_pipe_data():
 
 def read_from_pipe():
     return [line.strip() for line in sys.stdin.readlines()]
-
-
-##############################
-# convert list of object to json
-##############################
-def jsonify_objs(objs: list[any]):
-    """
-    convert list of objects to json format
-    :param objs: list of objects to be processed
-    :return: list of jsonified objects
-    """
-    json_list = []
-    for obj in objs:
-        temp = {}
-        for k, v in vars(obj).items():
-            if k.startswith("_"):
-                continue
-            temp[k] = str(v)
-        json_list.append(temp)
-    return json_list
 
 
 ##############################

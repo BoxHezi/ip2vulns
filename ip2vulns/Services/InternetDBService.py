@@ -88,11 +88,10 @@ def write_result(success_list: list, failure_list: list, out_option: str):
 
 def start_scan(ips: list, cvss_threshold: float) -> tuple[list, list]:
     """
-    Scans a list of IP addresses and filters the results based on a given CVSS score threshold
-    :param ips: A list of IP addresses to scan
-    :param cvedb: cvedb instance
-    :param cvss_threshold: A list of IP addresses to scan
-    :return: a size 2 tuple, contains success_list and failure_list
+    A function that starts a scan on a list of IP addresses to query information.
+    :param ips: A list of IP addresses to query information from.
+    :param cvss_threshold: A float representing the CVSS threshold for filtering results.
+    :return: A tuple containing two lists - success_list that holds InternetDB instances and failure_list that holds IP addresses.
     """
     print(f"Querying ip information from {ips[0]} ... {ips[-1]}")
     success_list = []  # contains InternetDB instance

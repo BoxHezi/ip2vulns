@@ -32,11 +32,3 @@ class InternetDB:
                 out.append(str(v))
         return ",".join(out)
 
-    # def format_data_for_db(self):
-    #     self.hostnames = utils.list_2_str(self.hostnames)
-    #     self.ports = utils.list_2_str(self.ports)
-    #     self.cpes = utils.list_2_str(self.cpes)
-    #     self.vulns = utils.list_2_str(self.vulns)
-    #     self.tags = utils.list_2_str(self.tags)
-
-

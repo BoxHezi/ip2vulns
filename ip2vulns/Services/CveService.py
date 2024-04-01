@@ -13,7 +13,13 @@ from ..Module.CVE import CVE
 END_POINT_PREFIX = "https://raw.githubusercontent.com/fkie-cad/nvd-json-data-feeds/main/"
 
 
-def construct_url(cve_id):
+def construct_url(cve_id: str) -> str:
+    """
+    Constructs a URL based on the given CVE ID.
+
+    :param cve_id: The CVE ID used to construct the URL.
+    :return: The constructed URL.
+    """
     year = cve_id[0:8]
     branch = cve_id[:-2] + "xx"
     ending = cve_id + ".json"
@@ -22,6 +28,12 @@ def construct_url(cve_id):
 
 
 def get_cve_info(cve_id: str) -> Optional[CVE]:
+    """
+    Retrieves information about a CVE using the provided CVE ID.
+
+    :param cve_id: The ID of the CVE.
+    :return: An CVE instance, or None if an exception occurs.
+    """
     cve_data_endpoint = construct_url(cve_id)
     try:
         resp = requests.get(cve_data_endpoint)
