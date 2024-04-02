@@ -1,12 +1,16 @@
 from setuptools import setup, find_packages
 
 
+VERSION_FILE_PATH = "./src/ip2vulns/version.py"
+
+
 def get_version():
-    with open("./src/ip2vulns/version.py") as f:
+    with open(VERSION_FILE_PATH) as f:
         for line in f:
             if line.startswith("__version__"):
                 delim = '"' if '"' in line else "'"
                 return line.split(delim)[1]
+__version = get_version()
 
 
 long_desc = ""
@@ -20,10 +24,9 @@ requires = [
     "tqdm"
 ]
 
-
 setup(
     name="ip2vulns",
-    version=get_version(),
+    version=__version,
     package_dir={"": "src"},
     packages=find_packages("src"),
     author="Box Hezi",

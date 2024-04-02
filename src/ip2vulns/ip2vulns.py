@@ -5,6 +5,9 @@ from . import utils
 from .Services import InternetDBService
 
 
+# TODO: add file input support
+
+
 def init_argparse():
     arg = argparse.ArgumentParser(description="IP 2 vulneribility tools", formatter_class=argparse.RawTextHelpFormatter)
     arg.add_argument("-i", "--input", help="Query information from https://internetdb.shodan.io/\n"
