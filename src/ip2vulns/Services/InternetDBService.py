@@ -109,6 +109,9 @@ def start_scan(ips: list, cvss_threshold: float) -> tuple[list, list]:
 
 
 def start(targets: list, out_option: str = "stdout", cvss_threshold: float = 0, ipv6: bool = False):
+    if not isinstance(targets, list):
+        raise ValueError("IP addresses or CIDR need to be passed in as a LIST")
+
     full_s_list = []  # store InternetDB instance for all ips has available information from internet.shodan.io
     full_f_list = []  # store ip addresses while exception happened during any stage of the scan progress
     to_scan_list = utils.split_list(list_to_ips(targets, ipv6))

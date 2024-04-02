@@ -64,5 +64,5 @@ from ip2vulns import ip2vulns_scan
 
 # s => success list
 # f => failure list
-s, f = ip2vulns_scan("<ip address>")
+s, f = ip2vulns_scan("[<ip address>]")  # ip address need to be passed in as a LIST
 ```
