@@ -24,13 +24,15 @@ def init_argparse():
 
 def main():
     args = init_argparse().parse_args()  # init argparse
+
     if utils.has_pipe_data():  # read from pipe, enable internetdb by default
         args.input = utils.read_from_pipe()
+    elif not any(vars(args).values()):  # check if argument is provided, if not, print help
+        args = init_argparse().parse_args(["-h"])
 
     if args.input:  # type(input) => list
         InternetDBService.start(args.input, args.out, args.cvss)
-
-    if args.version:
+    elif args.version:
         print(version.__version__)
 
 

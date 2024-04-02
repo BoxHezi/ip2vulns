@@ -49,3 +49,10 @@ For example, `ip2vulns -i 1.1.1.1 -o 1.1.1.1.csv`, the output file will be `1.1.
 
 When output to json file, a directory `out_json` will be created. Results will be stored using `<ip>.json`.
 For example, `ip2vulns -i 1.1.1.1 -o json`, then a directory `out_json` will be created. And the output filename will be `1.1.1.1.json`.
+
+## Example
+
+- `ip2vulns -i <ip address> <cidr>`
+- `ip2vulns -i <ip address> <cidr> -s 7`
+- `echo "<ip address>" | ip2vulns`
+- `echo "<ip address>" | ip2vulns -s 7`
