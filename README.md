@@ -56,3 +56,13 @@ For example, `ip2vulns -i 1.1.1.1 -o json`, then a directory `out_json` will be 
 - `ip2vulns -i <ip address> <cidr> -s 7`
 - `echo "<ip address>" | ip2vulns`
 - `echo "<ip address>" | ip2vulns -s 7`
+
+## Use `ip2vulns` in Python script
+
+```python
+from ip2vulns import ip2vulns_scan
+
+# s => success list
+# f => failure list
+s, f = ip2vulns_scan("<ip address>")
+```

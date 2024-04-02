@@ -108,7 +108,7 @@ def start_scan(ips: list, cvss_threshold: float) -> tuple[list, list]:
     return success_list, failure_list
 
 
-def start(targets: list, out_option: str, cvss_threshold: float, ipv6: bool = False):
+def start(targets: list, out_option: str = "stdout", cvss_threshold: float = 0, ipv6: bool = False):
     full_s_list = []  # store InternetDB instance for all ips has available information from internet.shodan.io
     full_f_list = []  # store ip addresses while exception happened during any stage of the scan progress
     to_scan_list = utils.split_list(list_to_ips(targets, ipv6))
@@ -120,6 +120,8 @@ def start(targets: list, out_option: str, cvss_threshold: float, ipv6: bool = Fa
         write_result(full_s_list, full_f_list, out_option)
     else:
         print(f"No available information from IP range from {to_scan_list[0][0]} ... {to_scan_list[-1][-1]}")
+
+    return full_s_list, full_f_list
 
 
     # TODO: (maybe) deduplicate all CVEs and process filter_cvss after dedup

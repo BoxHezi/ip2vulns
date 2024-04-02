@@ -1,5 +1,13 @@
 from setuptools import setup, find_packages
-from ip2vulns.version import __version__
+
+
+def get_version():
+    with open("./src/ip2vulns/version.py") as f:
+        for line in f:
+            if line.startswith("__version__"):
+                delim = '"' if '"' in line else "'"
+                return line.split(delim)[1]
+
 
 long_desc = ""
 with open("./README.md", "r") as file:
@@ -15,8 +23,9 @@ requires = [
 
 setup(
     name="ip2vulns",
-    version=__version__,
-    packages=find_packages(),
+    version=get_version(),
+    package_dir={"": "src"},
+    packages=find_packages("src"),
     author="Box Hezi",
     author_email="hezipypi.yixdpu@bumpmail.io",
     description="An IP to vulnerability utility",
