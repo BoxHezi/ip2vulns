@@ -9,7 +9,7 @@ from .Services import InternetDBService
 
 
 def init_argparse():
-    arg = argparse.ArgumentParser(description="IP 2 vulneribility tools", formatter_class=argparse.RawTextHelpFormatter)
+    arg = argparse.ArgumentParser(description="IP 2 vulnerability tools", formatter_class=argparse.RawTextHelpFormatter)
     arg.add_argument("-i", "--input", help="Query information from https://internetdb.shodan.io/\n"
                                                    "support multiple ip and cidr, separate using space, "
                                                    "e.g. -i 8.8.8.8 51.83.59.99 192.168.0.0/24\n",
@@ -21,6 +21,7 @@ def init_argparse():
                                          "Available option: stdout (default), csv, json\n"
                                          "For csv: please specify filename\n"
                                          "For json: a directory out_json will be created")
+    arg.add_argument("--disable-stdout", help="Disable stdout", action="store_true")
     arg.add_argument("-v", "--version", help="Print current version", action="store_true")
     return arg
 
@@ -34,7 +35,7 @@ def main():
         args = init_argparse().parse_args(["-h"])
 
     if args.input:  # type(input) => list
-        InternetDBService.start(args.input, args.out, args.cvss)
+        InternetDBService.start(args.input, args.out, args.cvss, args.disable_stdout)
     elif args.version:
         print(version.__version__)
 

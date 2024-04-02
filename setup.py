@@ -10,19 +10,24 @@ def get_version():
             if line.startswith("__version__"):
                 delim = '"' if '"' in line else "'"
                 return line.split(delim)[1]
+
+
+def get_long_description():
+    with open("./README.md", "r") as file:
+        return file.read()
+
+
 __version = get_version()
-
-
-long_desc = ""
-with open("./README.md", "r") as file:
-    for line in file:
-        long_desc += line
-
-
-requires = [
+__long_desc = get_long_description()
+__requires = [
     "requests",
     "tqdm"
 ]
+__entry = {
+    "console_scripts": [
+        "ip2vulns = ip2vulns.ip2vulns:main"
+    ]
+}
 
 setup(
     name="ip2vulns",
@@ -32,14 +37,10 @@ setup(
     author="Box Hezi",
     author_email="hezipypi.yixdpu@bumpmail.io",
     description="An IP to vulnerability utility",
-    long_description=long_desc,
+    long_description=__long_desc,
     long_description_content_type="text/markdown",
     url="https://github.com/BoxHezi/ip2vulns",
-    install_requires=requires,
-    entry_points={
-        'console_scripts': [
-            'ip2vulns = ip2vulns.ip2vulns:main'
-        ]
-    },
+    install_requires=__requires,
+    entry_points=__entry,
     python_requires=">=3.8"
 )

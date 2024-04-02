@@ -124,38 +124,19 @@ def read_from_pipe():
 ##############################
 # Output utility
 ##############################
-@contextlib.contextmanager
-def smart_open(file_path: str = None):
-    """
-    reference: https://stackoverflow.com/questions/17602878/how-to-handle-both-with-open-and-sys-stdout-nicely
-    """
-    if not file_path or file_path == "stdout":
-        fd = sys.stdout
-    else:
-        fd = open(file_path, "w")
-
-    try:
-        yield fd
-    finally:
-        if fd != sys.stdout:  # do not close stdout
-            fd.close()
-
-
 def output_to_dest(success_list: list, dest: str):
     """
     write data to given destination
     :param success_list: list of ip addresses contains information
     :param dest: destination to write to
     """
-    # print(len(success_list))
-    if dest is None or dest.endswith("csv"):  # output to stdout or csv
-        with smart_open(dest) as fd:
+    if dest.endswith("csv"):
+        with open(dest, "w") as fd:
             for item in success_list:
-                print(str(item), file=fd)
-    elif dest.lower() == "json":  # output to json
+                fd.write(str(item) + "\n")
+    elif dest.lower() == "json":
         prefix = "./out_json/"
         create_path(prefix)
         for item in success_list:
-            with smart_open(f"{prefix + item.ip}.json") as fd:
-                json.dump(vars(item), fp=fd, indent=4, sort_keys=True, default=str)
-
+            with open(f"{prefix + item.ip}.json", "w") as fd:
+                json.dump(vars(item), fd, indent=4, sort_keys=True, default=str)

@@ -21,13 +21,13 @@ Using the following pip command to install: `pip install ip2vulns`
 # Usage
 
 ```text
-usage: ip2vulns [-h] [-i ip_or_cidr [ip_or_cidr ...]] [-o OUT] [-s CVSS] [-v]
+usage: ip2vulns [-h] [-i INPUT [INPUT ...]] [-s CVSS] [-o OUT] [--disable-stdout] [-v]
 
-IP 2 vulneribility tools
+IP 2 vulnerability tools
 
 options:
   -h, --help            show this help message and exit
-  -i ip_or_cidr [ip_or_cidr ...], --input ip_or_cidr [ip_or_cidr ...]
+  -i INPUT [INPUT ...], --input INPUT [INPUT ...]
                         Query information from https://internetdb.shodan.io/
                         support multiple ip and cidr, separate using space, e.g. -i 8.8.8.8 51.83.59.99 192.168.0.0/24
   -s CVSS, --cvss CVSS  Enable cvss score filter, required a number
@@ -37,18 +37,19 @@ options:
                         Available option: stdout (default), csv, json
                         For csv: please specify filename
                         For json: a directory out_json will be created
+  --disable-stdout      Disable stdout
   -v, --version         Print current version
 ```
 
 ## Output to file
-
-When no `-o/--out` option is provided, results are printed to stdout.
 
 When output to csv file, please specify the filename.
 For example, `ip2vulns -i 1.1.1.1 -o 1.1.1.1.csv`, the output file will be `1.1.1.1.csv`.
 
 When output to json file, a directory `out_json` will be created. Results will be stored using `<ip>.json`.
 For example, `ip2vulns -i 1.1.1.1 -o json`, then a directory `out_json` will be created. And the output filename will be `1.1.1.1.json`.
+
+To disable print to stdout, apply `--disable-stdout` in command line argument
 
 ## Example
 

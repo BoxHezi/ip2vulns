@@ -71,15 +71,18 @@ def filter_cvss(idb: InternetDB, cvss_threshold: float) -> bool:
     return False
 
 
-def write_result(success_list: list, failure_list: list, out_option: str):
+def write_result(success_list: list, failure_list: list, out_dest: str, disable_stdout: bool = False):
     """
     Writes the results of the IP scan to the specified output destination. If no destination is specified, results are written to stdout.
     :param success_list: A list of successful InternetDB instances.
     :param failure_list: A list of IP addresses where exceptions occurred during querying from the Shodan InternetDB API.
-    :param out_option: The output option, which can be 'stdout' (default), 'csv', or 'json'.
+    :param out_dest: The output option, which can be 'stdout' (default), 'csv', or 'json'.
     """
     if len(success_list) != 0:
-        utils.output_to_dest(success_list, out_option)  # writing to destination (stdout by default)
+        if not disable_stdout:
+            for item in success_list:
+                print(item)
+        out_dest and utils.output_to_dest(success_list, out_dest)  # writing to destination
     if len(failure_list) != 0:
         print("\nException happened during following IP addresses: ")
         for ip in failure_list:
@@ -108,7 +111,7 @@ def start_scan(ips: list, cvss_threshold: float) -> tuple[list, list]:
     return success_list, failure_list
 
 
-def start(targets: list, out_option: str = "stdout", cvss_threshold: float = 0, ipv6: bool = False):
+def start(targets: list, out_dest: str = None, cvss_threshold: float = 0, disable_stdout: bool = False, ipv6: bool = False) -> tuple[list, list]:
     if not isinstance(targets, list):
         raise ValueError("IP addresses or CIDR need to be passed in as a LIST")
 
@@ -120,7 +123,7 @@ def start(targets: list, out_option: str = "stdout", cvss_threshold: float = 0, 
         full_s_list += s_list
         full_f_list += f_list
     if len(full_s_list) != 0 or len(full_f_list) != 0:
-        write_result(full_s_list, full_f_list, out_option)
+        write_result(full_s_list, full_f_list, out_dest, disable_stdout)
     else:
         print(f"No available information from IP range from {to_scan_list[0][0]} ... {to_scan_list[-1][-1]}")
 
