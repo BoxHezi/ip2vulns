@@ -57,6 +57,10 @@ To disable print to stdout, apply `--disable-stdout` in command line argument
 - `ip2vulns -i <ip address> <cidr> -s 7`
 - `echo "<ip address>" | ip2vulns`
 - `echo "<ip address>" | ip2vulns -s 7`
+- `ip2vulns -i <input file>`
+- `cat <input file> | ip2vulns`
+
+**When input is file, only the first element will be considered**<br>_TODO: add support for multiple files and with valid IPs or CIDR_
 
 ## Use `ip2vulns` in Python script
 
