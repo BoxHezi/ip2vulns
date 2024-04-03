@@ -1,8 +1,9 @@
 import argparse
 
 from . import version
-from . import utils
 from .Services import InternetDBService
+
+from .Utils import PipeUtils
 
 
 def init_argparse():
@@ -23,17 +24,29 @@ def init_argparse():
     return arg
 
 
+def parse_args_input(input: list):
+    if len(input) == 1:  # when input is possibly a file
+        try:
+            with open(input[0]) as f:  # input is a file
+                # print("input is a file")
+                result = [line.strip() for line in f]
+                return result
+        except FileNotFoundError:  # input is ip or cidr
+            pass
+    # print("input is IP or CIDR")
+    return input
+
+
 def main():
     args = init_argparse().parse_args()  # init argparse
 
-    if utils.has_pipe_data():  # read from pipe, enable internetdb by default
-        args.input = utils.read_from_pipe()
+    if PipeUtils.has_pipe_data():  # read from pipe, enable internetdb by default
+        args.input = PipeUtils.read_from_pipe()
     elif not any(vars(args).values()):  # check if argument is provided, if not, print help
         args = init_argparse().parse_args(["-h"])
 
     if args.input:  # type(input) => list
-        # TODO: test file input support
-        input_list = utils.parse_args_input(args.input)
+        input_list = parse_args_input(args.input)
         InternetDBService.start(input_list, args.out, args.cvss, args.disable_stdout)
     elif args.version:
         print(version.__version__)

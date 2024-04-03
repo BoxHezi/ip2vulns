@@ -1,16 +1,14 @@
-import requests
-
 from typing import Optional
 
-from .. import utils
 from ..Module.CVE import CVE
 
-# Get CVE Info from: https://github.com/fkie-cad/nvd-json-data-feeds/tree/main
+from ..Utils import QueryUtils
 
+# Get CVE Info from: https://github.com/fkie-cad/nvd-json-data-feeds/tree/main
 # get raw content: https://raw.githubusercontent.com/fkie-cad/nvd-json-data-feeds/main/<CVE years>/<CVE-id-prefix>/<CVE-id>.json
 
 
-END_POINT_PREFIX = "https://raw.githubusercontent.com/fkie-cad/nvd-json-data-feeds/main/"
+ENDPOINT_PREFIX = "https://raw.githubusercontent.com/fkie-cad/nvd-json-data-feeds/main/"
 
 
 def construct_url(cve_id: str) -> str:
@@ -24,7 +22,7 @@ def construct_url(cve_id: str) -> str:
     branch = cve_id[:-2] + "xx"
     ending = cve_id + ".json"
 
-    return END_POINT_PREFIX + year + "/" + branch + "/" + ending
+    return ENDPOINT_PREFIX + year + "/" + branch + "/" + ending
 
 
 def get_cve_info(cve_id: str) -> Optional[CVE]:
@@ -36,8 +34,8 @@ def get_cve_info(cve_id: str) -> Optional[CVE]:
     """
     cve_data_endpoint = construct_url(cve_id)
     try:
-        resp = requests.get(cve_data_endpoint)
-        resp_json = utils.resp_2_json(resp)
+        resp = QueryUtils.get_query(cve_data_endpoint)
+        resp_json = QueryUtils.resp_2_json(resp)
         return CVE(**resp_json)
     except:
         print(f"Exception while querying CVE {cve_id}")

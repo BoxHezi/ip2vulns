@@ -3,7 +3,15 @@ from typing import Optional
 
 from ..Module.InternetDB import InternetDB
 from ..Module.CVE import CVE
-from .. import utils
+
+# from ..Utils import QueryUtils
+# from ..Utils import IpUtils
+# from ..Utils import ListUtils
+# from ..Utils import OutputUtils
+from ..Utils import QueryUtils
+from ..Utils import IpUtils
+from ..Utils import ListUtils
+from ..Utils import OutputUtils
 
 from . import CveService
 
@@ -14,7 +22,7 @@ from . import CveService
 CVE_CACHE: dict[str, CVE] = {}
 
 
-def list_to_ips(ls: list, ipv6: bool = False) -> list:
+def input_list_to_ips(ls: list, ipv6: bool = False) -> list:
     """
     convert input list (either IPs or cidr, or both) to list of ip
     :param ls: list to convert
@@ -23,8 +31,8 @@ def list_to_ips(ls: list, ipv6: bool = False) -> list:
     """
     temp = []
     for i in ls:
-        if utils.is_cidr(i):
-            temp += utils.cidr2ip(i, ipv6)
+        if IpUtils.is_cidr(i):
+            temp += IpUtils.cidr2ip(i, ipv6)
         else:
             temp.append(i)
     return list(dict.fromkeys(temp))  # deduplicate
@@ -36,8 +44,10 @@ def query_idb(ip: str) -> Optional[InternetDB]:
     :param ip: target ip address
     :return: InternetDB instance, None if no information is available
     """
-    resp = utils.internet_db_query(ip, 50)
-    resp_json = utils.resp_2_json(resp)
+    idb_prefix = "https://internetdb.shodan.io/"
+    idb_endpoint = idb_prefix + ip
+    resp = QueryUtils.get_query(idb_endpoint)
+    resp_json = QueryUtils.resp_2_json(resp)
     if "ip" not in resp_json:
         return None
     return InternetDB(**resp_json)
@@ -82,7 +92,7 @@ def write_result(success_list: list, failure_list: list, out_dest: str, disable_
         if not disable_stdout:
             for item in success_list:
                 print(item)
-        out_dest and utils.output_to_dest(success_list, out_dest)  # writing to destination
+        out_dest and OutputUtils.output_to_dest(success_list, out_dest)  # writing to destination
     if len(failure_list) != 0:
         print("\nException happened during following IP addresses: ")
         for ip in failure_list:
@@ -117,7 +127,7 @@ def start(targets: list, out_dest: str = None, cvss_threshold: float = 0, disabl
 
     full_s_list = []  # store InternetDB instance for all ips has available information from internet.shodan.io
     full_f_list = []  # store ip addresses while exception happened during any stage of the scan progress
-    to_scan_list = utils.split_list(list_to_ips(targets, ipv6))
+    to_scan_list = ListUtils.split_list(input_list_to_ips(targets, ipv6))
     for i in range(len(to_scan_list)):
         s_list, f_list = start_scan(to_scan_list[i], cvss_threshold)
         full_s_list += s_list
