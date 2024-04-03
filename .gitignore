@@ -8,3 +8,5 @@ databases/
 __pycache__/
 
 *.csv
+input.cidr
+input.ip
