@@ -121,9 +121,18 @@ def start(targets: list, out_dest: str = None, cvss_threshold: float = 0, disabl
     if not isinstance(targets, list):
         raise ValueError("IP addresses or CIDR need to be passed in as a LIST")
 
+    temp_target = []
+    for t in targets:
+        try:
+            with open(t, "r") as f:  # element is a file
+                temp_target += [line.strip() for line in f.readlines()]
+        except FileNotFoundError:  # element is a IP or a CIDR
+            temp_target.append(t)
+    temp_target = input_list_to_ips(temp_target, ipv6)
+
     full_s_list = []  # store InternetDB instance for all ips has available information from internet.shodan.io
     full_f_list = []  # store ip addresses while exception happened during any stage of the scan progress
-    to_scan_list = ListUtils.split_list(input_list_to_ips(targets, ipv6))
+    to_scan_list = ListUtils.split_list(temp_target)
     for i in range(len(to_scan_list)):
         s_list, f_list = start_scan(to_scan_list[i], cvss_threshold)
         full_s_list += s_list

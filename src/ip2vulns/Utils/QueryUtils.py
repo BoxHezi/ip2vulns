@@ -10,8 +10,7 @@ def get_query(endpoint: str, get_param: dict = {}, timeout: int = 50):
     :param timeout: The timeout for the request in seconds. Defaults to 50.
     :return: The response object from the GET request.
     """
-    if get_param:
-        endpoint += "?" + "&".join([f"{k}={v}" for k, v in get_param.items()])
+    endpoint += "?" + "&".join([f"{k}={v}" for k, v in get_param.items()]) if get_param else ""
     return requests.get(endpoint, timeout=timeout)
 
 
