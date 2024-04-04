@@ -2,6 +2,7 @@ from setuptools import setup, find_packages
 
 
 VERSION_FILE_PATH = "./src/ip2vulns/version.py"
+README_PATH = "./README.md"
 
 
 def get_version():
@@ -13,7 +14,7 @@ def get_version():
 
 
 def get_long_description():
-    with open("./README.md", "r") as file:
+    with open(README_PATH, "r") as file:
         return file.read()
 
 

@@ -35,7 +35,7 @@ def get_cve_info(cve_id: str) -> Optional[CVE]:
     cve_data_endpoint = construct_url(cve_id)
     try:
         resp = QueryUtils.get_query(cve_data_endpoint)
-        resp_json = QueryUtils.resp_2_json(resp)
+        resp_json = QueryUtils.resp2json(resp)
         return CVE(**resp_json)
     except:
         print(f"Exception while querying CVE {cve_id}")

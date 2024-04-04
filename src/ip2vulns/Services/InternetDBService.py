@@ -43,7 +43,7 @@ def query_idb(ip: str) -> Optional[InternetDB]:
     idb_prefix = "https://internetdb.shodan.io/"
     idb_endpoint = idb_prefix + ip
     resp = QueryUtils.get_query(idb_endpoint)
-    resp_json = QueryUtils.resp_2_json(resp)
+    resp_json = QueryUtils.resp2json(resp)
     if "ip" not in resp_json:
         return None
     return InternetDB(**resp_json)
@@ -154,6 +154,4 @@ def start(targets: list, out_dest: str = None, cvss_threshold: float = 0, disabl
 
     # print(len(cve_set))
     # print(count)
-
-
 

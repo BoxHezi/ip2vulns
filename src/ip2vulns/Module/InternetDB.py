@@ -23,7 +23,7 @@ class InternetDB:
         # re-order keys of attribute
         attribute_order = ["ip_int", "ip", "hostnames", "ports", "cpes", "vulns", "tags", "last_updated"]
         out_dict = {k: getattr(self, k) for k in attribute_order}
-        out_dict.update({"last_updated": DatetimeUtils.datetime_2_str(out_dict.get("last_updated"))})
+        out_dict.update({"last_updated": DatetimeUtils.datetime2str(out_dict.get("last_updated"))})
 
         out = []
         for k, v in out_dict.items():
