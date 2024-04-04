@@ -6,5 +6,5 @@ def has_pipe_data():
     return not os.isatty(sys.stdin.fileno())
 
 
-def read_from_pipe():
+def read_from_pipe() -> list:
     return [line.strip() for line in sys.stdin.readlines()]

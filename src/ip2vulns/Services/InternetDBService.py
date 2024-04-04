@@ -4,10 +4,6 @@ from typing import Optional
 from ..Module.InternetDB import InternetDB
 from ..Module.CVE import CVE
 
-# from ..Utils import QueryUtils
-# from ..Utils import IpUtils
-# from ..Utils import ListUtils
-# from ..Utils import OutputUtils
 from ..Utils import QueryUtils
 from ..Utils import IpUtils
 from ..Utils import ListUtils

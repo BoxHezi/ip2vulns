@@ -28,12 +28,10 @@ def parse_args_input(input: list):
     if len(input) == 1:  # when input is possibly a file
         try:
             with open(input[0]) as f:  # input is a file
-                # print("input is a file")
                 result = [line.strip() for line in f]
                 return result
         except FileNotFoundError:  # input is ip or cidr
             pass
-    # print("input is IP or CIDR")
     return input
 
 
