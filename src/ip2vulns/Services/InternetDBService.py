@@ -18,23 +18,6 @@ from . import CveService
 CVE_CACHE: dict[str, CVE] = {}
 
 
-def input_list_to_ips(ls: list, ipv6: bool = False) -> list:
-    """
-    convert input list (either IPs or cidr, or both) to list of ip
-    :param ls: list to convert
-    :param ipv6: use IPv6 if True. Default set to False
-    :return: a list contains IP addresses
-    """
-    temp = []
-    for i in ls:
-        if IpUtils.is_cidr(i):
-            temp += IpUtils.cidr2ip(i, ipv6)
-        else:
-            # TODO: filter out invalid IP (e.g. 999.999.999.999) and none ip string
-            temp.append(i)
-    return list(dict.fromkeys(temp))  # deduplicate
-
-
 def query_idb(ip: str) -> Optional[InternetDB]:
     """
     query internetdb api for ip
@@ -100,7 +83,7 @@ def start_scan(ips: list, cvss_threshold: float) -> tuple[list, list]:
     return success_list, failure_list
 
 
-def start(targets: list, out_dest: str = None, cvss_threshold: float = 0, nostdout: bool = False, ipv6: bool = False) -> tuple[list, list]:
+def start(targets: list, out_dest: str = None, cvss_threshold: float = 0, nostdout: bool = False) -> tuple[list, list]:
     if not isinstance(targets, list):
         raise ValueError("IP addresses or CIDR need to be passed in as a LIST")
 
@@ -111,7 +94,7 @@ def start(targets: list, out_dest: str = None, cvss_threshold: float = 0, nostdo
                 temp_target += [line.strip() for line in f.readlines()]
         except FileNotFoundError:  # element is a IP or a CIDR
             temp_target.append(t)
-    temp_target = input_list_to_ips(temp_target, ipv6)
+    temp_target = IpUtils.expand_list_2_ips(temp_target)
 
     full_s_list = []  # store InternetDB instance for all ips has available information from internet.shodan.io
     full_f_list = []  # store ip addresses while exception happened during any stage of the scan progress

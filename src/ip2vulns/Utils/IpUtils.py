@@ -1,28 +1,25 @@
 import ipaddress
-import re
-
-CIDR_PATTERN = r"\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\/\d{1,2}"
 
 
-def is_cidr(s: str):
+def expand_list_2_ips(input: list[str]) -> list[str]:
     """
-    check if given string is cidr format
-    :param s: string to check
-    :return: True if in cidr format, False otherwise
-    """
-    return re.match(CIDR_PATTERN, s)
+    Expand a list of strings containing IP addresses and CIDR notations into a list of valid IP addresses. Invalid IP or CIDR will be filtered out.
 
-
-def cidr2ip(cidr: str, t6: bool = False) -> list:
+    :param input: a list of strings containing IP addresses and CIDR notations
+    :return: A list of strings containing valid IP addresses
     """
-    convert cidr to ip list
-    :param cidr: cidr representation
-    :param t6: True if convert target is ipv6 address
-    :return: list of ip address
-    """
-    if not t6:
-        return [str(ip) for ip in ipaddress.IPv4Network(cidr)]
-    return [str(ip) for ip in ipaddress.IPv6Network(cidr)]
+    ip_list = []
+    for i in input:
+        try:
+            _ = ipaddress.ip_address(i)  # test if i is a valid IP
+            ip_list.append(i)
+        except ValueError:  # either valid CIDR or invalid string
+            try:
+                net = ipaddress.ip_network(i)
+                ip_list += [str(j) for j in net]  # valid CIDR
+            except ValueError:  # neither IP nor CIDR
+                print(f"{i} is neithor valid IP nor valid CIDR format")
+    return ip_list
 
 
 def ip_int(ip: str) -> int:
