@@ -30,6 +30,7 @@ def input_list_to_ips(ls: list, ipv6: bool = False) -> list:
         if IpUtils.is_cidr(i):
             temp += IpUtils.cidr2ip(i, ipv6)
         else:
+            # TODO: filter out invalid IP (e.g. 999.999.999.999) and none ip string
             temp.append(i)
     return list(dict.fromkeys(temp))  # deduplicate
 
@@ -77,24 +78,6 @@ def filter_cvss(idb: InternetDB, cvss_threshold: float) -> bool:
     return False
 
 
-def write_result(success_list: list, failure_list: list, out_dest: str, disable_stdout: bool = False):
-    """
-    Writes the results of the IP scan to the specified output destination. If no destination is specified, results are written to stdout.
-    :param success_list: A list of successful InternetDB instances.
-    :param failure_list: A list of IP addresses where exceptions occurred during querying from the Shodan InternetDB API.
-    :param out_dest: The output option, which can be 'stdout' (default), 'csv', or 'json'.
-    """
-    if len(success_list) != 0:
-        if not disable_stdout:
-            for item in success_list:
-                print(item)
-        out_dest and OutputUtils.output_to_dest(success_list, out_dest)  # writing to destination
-    if len(failure_list) != 0:
-        print("\nException happened during following IP addresses: ")
-        for ip in failure_list:
-            print(ip)
-
-
 def start_scan(ips: list, cvss_threshold: float) -> tuple[list, list]:
     """
     A function that starts a scan on a list of IP addresses to query information.
@@ -117,7 +100,7 @@ def start_scan(ips: list, cvss_threshold: float) -> tuple[list, list]:
     return success_list, failure_list
 
 
-def start(targets: list, out_dest: str = None, cvss_threshold: float = 0, disable_stdout: bool = False, ipv6: bool = False) -> tuple[list, list]:
+def start(targets: list, out_dest: str = None, cvss_threshold: float = 0, nostdout: bool = False, ipv6: bool = False) -> tuple[list, list]:
     if not isinstance(targets, list):
         raise ValueError("IP addresses or CIDR need to be passed in as a LIST")
 
@@ -137,11 +120,8 @@ def start(targets: list, out_dest: str = None, cvss_threshold: float = 0, disabl
         s_list, f_list = start_scan(to_scan_list[i], cvss_threshold)
         full_s_list += s_list
         full_f_list += f_list
-    if len(full_s_list) != 0 or len(full_f_list) != 0:
-        write_result(full_s_list, full_f_list, out_dest, disable_stdout)
-    else:
-        print(f"No available information from IP range from {to_scan_list[0][0]} ... {to_scan_list[-1][-1]}")
 
+    OutputUtils.show_scan_result(to_scan_list, full_s_list, full_f_list, out_dest, nostdout)
     return full_s_list, full_f_list
 
 
