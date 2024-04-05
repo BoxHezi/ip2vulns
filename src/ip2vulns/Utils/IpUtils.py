@@ -1,15 +1,16 @@
 import ipaddress
 
 
-def expand_list_2_ips(input: list[str]) -> list[str]:
+def expand_list_2_ips(ls: list[str]) -> list[str]:
     """
-    Expand a list of strings containing IP addresses and CIDR notations into a list of valid IP addresses. Invalid IP or CIDR will be filtered out.
+    Expand a list of strings containing IP addresses and CIDR notations into a list of valid IP addresses. Invalid IP
+    or CIDR will be filtered out.
 
-    :param input: a list of strings containing IP addresses and CIDR notations
+    :param ls: a list of strings containing IP addresses and CIDR notations
     :return: A list of strings containing valid IP addresses
     """
     ip_list = []
-    for i in input:
+    for i in ls:
         try:
             _ = ipaddress.ip_address(i)  # test if i is a valid IP
             ip_list.append(i)
@@ -18,7 +19,7 @@ def expand_list_2_ips(input: list[str]) -> list[str]:
                 net = ipaddress.ip_network(i)
                 ip_list += [str(j) for j in net]  # valid CIDR
             except ValueError:  # neither IP nor CIDR
-                print(f"{i} is neithor valid IP nor valid CIDR format")
+                print(f"{i} is neither valid IP nor valid CIDR format")
     return ip_list
 
 

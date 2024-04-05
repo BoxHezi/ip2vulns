@@ -23,10 +23,11 @@ def output_to_dest(success_list: list, dest: str):
 
 def show_scan_result(full_list: list[list[str]], s_list: list[object], f_list: list[str], out_dest: str, nostdout: bool = False):
     """
-    Writes the results of the IP scan to the specified output destination. If no destination is specified, results are written to stdout.
+    Writes the results of the IP scan to the specified output destination. If no destination is specified, results are
+    written to stdout.
     :param full_list: A 2D list contains IP scanned IP address
-    :param success_list: A list of successful InternetDB instances.
-    :param failure_list: A list of IP addresses where exceptions occurred during querying from the Shodan InternetDB API.
+    :param s_list: A list of successful InternetDB instances.
+    :param f_list: A list of IP addresses where exceptions occurred during querying from the Shodan InternetDB API.
     :param out_dest: The output option, which can be either 'csv' or 'json'.
     :param nostdout: A flag to indicate whether to print to stdout.
     """

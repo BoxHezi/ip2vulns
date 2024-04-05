@@ -107,7 +107,6 @@ def start(targets: list, out_dest: str = None, cvss_threshold: float = 0, nostdo
     OutputUtils.show_scan_result(to_scan_list, full_s_list, full_f_list, out_dest, nostdout)
     return full_s_list, full_f_list
 
-
     # TODO: (maybe) deduplicate all CVEs and process filter_cvss after dedup
     # cve_set = set()
     # count = 0
@@ -117,4 +116,3 @@ def start(targets: list, out_dest: str = None, cvss_threshold: float = 0, nostdo
 
     # print(len(cve_set))
     # print(count)
-
