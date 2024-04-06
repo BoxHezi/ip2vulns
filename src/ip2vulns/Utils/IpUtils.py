@@ -17,10 +17,10 @@ def expand_list_2_ips(ls: list[str]) -> list[str]:
         except ValueError:  # either valid CIDR or invalid string
             try:
                 net = ipaddress.ip_network(i)
-                ip_list += [str(j) for j in net]  # valid CIDR
+                ip_list += [str(_) for _ in net]  # valid CIDR
             except ValueError:  # neither IP nor CIDR
                 print(f"{i} is neither valid IP nor valid CIDR format")
-    return ip_list
+    return list(dict.fromkeys(ip_list))  # deduplicate
 
 
 def ip_int(ip: str) -> int:
