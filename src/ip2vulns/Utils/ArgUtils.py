@@ -7,6 +7,9 @@ def init_argparse():
                                            "support multiple ip and cidr, separate using space, "
                                            "e.g. -i 8.8.8.8 51.83.59.99 192.168.0.0/24\n",
                      nargs="+")
+    arg.add_argument("--cvedict", help="Config CVE database"
+                                       "integrate with go-cvedict, checkout at: https://github.com/BoxHezi/go-cvedict",
+                     default=None)
     arg.add_argument("-s", "--cvss", help="Enable cvss score filter, required a number\n"
                                           "If 0 is given, targets found with no CVE information will be filtered out. "
                                           "And all CVEs will be checked.\n"

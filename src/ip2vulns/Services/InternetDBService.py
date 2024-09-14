@@ -33,7 +33,7 @@ def query_idb(ip: str) -> Optional[InternetDB]:
     return InternetDB(**resp_json)
 
 
-def filter_cvss(idb: InternetDB, cvss_threshold: float) -> bool:
+def filter_cvss(idb: InternetDB, cvss_threshold: float, cvedict_addr: Optional[str] = None) -> bool:
     """
     Filters CVEs based on a given CVSS score. If the CVSS score of a given CVE is higher than the CVSS threshold score, the function returns True.
 
@@ -52,16 +52,19 @@ def filter_cvss(idb: InternetDB, cvss_threshold: float) -> bool:
         pbar.set_description(f"Checking {cve_id}")
         cve = CVE_CACHE.get(cve_id, None)
         if not cve:
-            cve = CveService.get_cve_info(cve_id)
+            cve = CveService.get_cve_info(cve_id, cvedict_addr)
             CVE_CACHE.update({cve.get_id(): cve})
 
-        cvss = cve.get_cvss_score()
-        if float(cvss[1]) > float(cvss_threshold):
-            return True
+        cvss_info = cve.get_cvss_score()
+        for cvss in cvss_info:
+            if float(cvss[1]) > float(cvss_threshold):
+                return True
+        # if float(cvss_info[1]) > float(cvss_threshold):
+        #     return True
     return False
 
 
-def start_scan(ips: list, cvss_threshold: float) -> tuple[list, list]:
+def start_scan(ips: list, cvss_threshold: float, cvedict_addr: Optional[str] = None) -> tuple[list, list]:
     """
     A function that starts a scan on a list of IP addresses to query information.
     :param ips: A list of IP addresses to query information from.
@@ -75,7 +78,7 @@ def start_scan(ips: list, cvss_threshold: float) -> tuple[list, list]:
         pbar.set_description(f"Querying {ip}")
         try:
             idb = query_idb(ip)  # return InternetDB instance if there is information available, None otherwise
-            if idb and filter_cvss(idb, cvss_threshold):
+            if idb and filter_cvss(idb, cvss_threshold, cvedict_addr):
                 success_list.append(idb)
         except Exception as e:
             print(f"Exception: {e} while querying {ip}")
@@ -83,7 +86,7 @@ def start_scan(ips: list, cvss_threshold: float) -> tuple[list, list]:
     return success_list, failure_list
 
 
-def start(targets: list, out_dest: str = None, cvss_threshold: float = 0, nostdout: bool = False) -> tuple[list, list]:
+def start(targets: list, out_dest: str = None, cvss_threshold: float = 0, cvedict_addr: Optional[str] = None, nostdout: bool = False) -> tuple[list, list]:
     if not isinstance(targets, list):
         raise ValueError("IP addresses or CIDR need to be passed in as a LIST")
 
@@ -100,7 +103,7 @@ def start(targets: list, out_dest: str = None, cvss_threshold: float = 0, nostdo
     full_f_list = []  # store ip addresses while exception happened during any stage of the scan progress
     to_scan_list = ListUtils.split_list(temp_target)
     for i in range(len(to_scan_list)):
-        s_list, f_list = start_scan(to_scan_list[i], cvss_threshold)
+        s_list, f_list = start_scan(to_scan_list[i], cvss_threshold, cvedict_addr)
         full_s_list += s_list
         full_f_list += f_list
 

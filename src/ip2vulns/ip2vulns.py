@@ -14,7 +14,7 @@ def main():
         args = ArgUtils.init_argparse().parse_args(["-h"])
 
     if args.input:  # type(input) => list
-        InternetDBService.start(args.input, args.out, args.cvss, args.nostdout)
+        InternetDBService.start(args.input, args.out, args.cvss, args.cvedict,args.nostdout)
     elif args.version:
         print(version.__version__)
 
