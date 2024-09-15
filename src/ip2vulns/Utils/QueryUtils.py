@@ -15,12 +15,7 @@ def get_query(endpoint: str, get_param: dict = {}, timeout: int = 50, proxies: O
     # print("Proxies: ", proxies)
 
     endpoint += "?" + "&".join([f"{k}={v}" for k, v in get_param.items()]) if get_param else ""
-    if not proxies:
-        # print("WITHOUT PROXIES")
-        return requests.get(endpoint, timeout=timeout)
-    else:
-        # print("WITH PROXIES")
-        return requests.get(endpoint, timeout=timeout, proxies=proxies)
+    return requests.get(endpoint, timeout=timeout, proxies=proxies)
 
 
 def resp2json(resp: requests.Response):
