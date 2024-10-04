@@ -30,7 +30,7 @@ options:
   -i INPUT [INPUT ...], --input INPUT [INPUT ...]
                         Query information from https://internetdb.shodan.io/
                         support multiple ip and cidr, separate using space, e.g. -i 8.8.8.8 51.83.59.99 192.168.0.0/24
-  --cvedict CVEDICT     Config CVE databaseintegrate with go-cvedict, checkout at: https://github.com/BoxHezi/go-cvedict
+  --cvedict CVEDICT     Config CVE database integrate with go-cvedict, checkout at: https://github.com/BoxHezi/go-cvedict
   -s CVSS, --cvss CVSS  Enable cvss score filter, required a number
                         If 0 is given, targets found with no CVE information will be filtered out. And all CVEs will be checked.
                         When 0 is given, the process can be slow if huge amount of CVEs are founded.Not Recommend to pass 0 in.
