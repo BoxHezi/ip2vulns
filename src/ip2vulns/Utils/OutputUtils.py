@@ -1,6 +1,9 @@
 import json
 
 from . import PathUtils
+from .LogUtils import get_logger
+
+logger = get_logger()
 
 
 def output_to_dest(success_list: list, dest: str):
@@ -37,7 +40,7 @@ def show_scan_result(full_list: list[list[str]], s_list: list[object], f_list: l
                 print(*s_list, sep="\n")
             out_dest and output_to_dest(s_list, out_dest)
         if len(f_list) != 0:
-            print("\nException happened during following IP addresses: ")
-            print(*f_list, sep="\n")
+            logger.exception("Exception happened during following IP addresses: ")
+            logger.exception(*f_list, sep="\n")
     else:
-        print(f"No available information from {full_list[0][0]} ... {full_list[-1][-1]}")
+        logger.exception(f"No available information from {full_list[0][0]} ... {full_list[-1][-1]}")

@@ -1,5 +1,8 @@
 import ipaddress
 
+from .LogUtils import get_logger
+
+logger = get_logger()
 
 def expand_list_2_ips(ls: list[str]) -> list[str]:
     """
@@ -18,8 +21,9 @@ def expand_list_2_ips(ls: list[str]) -> list[str]:
             try:
                 net = ipaddress.ip_network(i)
                 ip_list += [str(_) for _ in net]  # valid CIDR
+                logger.info(f"Expanded {i} into {net}")
             except ValueError:  # neither IP nor CIDR
-                print(f"{i} is neither valid IP nor valid CIDR format")
+                logger.error(f"{i} is neither valid IP nor valid CIDR format")
     return list(dict.fromkeys(ip_list))  # deduplicate
 
 
